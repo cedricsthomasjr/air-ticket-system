@@ -1,0 +1,9 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Airline Staff Home</h1>
+<p>Welcome, {{ name }} ({{ airline }})</p>
+<nav>
+  <a href="{{ url_for('staff_flights') }}">View Flights</a>
+  <a href="{{ url_for('create_flight') }}">Create New Flight</a>
+  <a href="{{ url_for('logout') }}">Logout</a>
+</nav>
+{% endblock %}

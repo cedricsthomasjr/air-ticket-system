@@ -1,0 +1,39 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Search Flights</h1>
+<form method="POST">
+  <label>Source:</label>
+  <input type="text" name="source" />
+  <label>Destination:</label>
+  <input type="text" name="destination" />
+  <button type="submit">Search</button>
+</form>
+
+<br />
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Airline</th>
+    <th>Source</th>
+    <th>Destination</th>
+    <th>Departure</th>
+    <th>Arrival</th>
+    <th>Price</th>
+    <th>Status</th>
+  </tr>
+  {% for flight in flights %}
+  <tr>
+    <td>{{ flight['flight_id'] }}</td>
+    <td>{{ flight['airline_name'] }}</td>
+    <td>{{ flight['source_airport'] }}</td>
+    <td>{{ flight['destination_airport'] }}</td>
+    <td>{{ flight['departure_time'] }}</td>
+    <td>{{ flight['arrival_time'] }}</td>
+    <td>{{ flight['price'] }}</td>
+    <td>{{ flight['status'] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<br />
+<a href="{{ url_for('customer_home') }}">Back</a>
+{% endblock %}

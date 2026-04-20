@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Flights for Next 30 Days</h1>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Source</th>
+    <th>Destination</th>
+    <th>Departure</th>
+    <th>Arrival</th>
+    <th>Price</th>
+    <th>Status</th>
+  </tr>
+  {% for flight in flights %}
+  <tr>
+    <td>{{ flight['flight_id'] }}</td>
+    <td>{{ flight['source_airport'] }}</td>
+    <td>{{ flight['destination_airport'] }}</td>
+    <td>{{ flight['departure_time'] }}</td>
+    <td>{{ flight['arrival_time'] }}</td>
+    <td>{{ flight['price'] }}</td>
+    <td>{{ flight['status'] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<br />
+<a href="{{ url_for('staff_home') }}">Back</a>
+{% endblock %}
