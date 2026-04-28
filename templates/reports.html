@@ -40,6 +40,7 @@
 <section class="panel">
   <p class="eyebrow">Month Wise</p>
   {% if monthly %}
+  <canvas id="monthlyTicketsChart" height="110"></canvas>
   <div class="table-wrap">
     <table>
       <tr>
@@ -62,4 +63,47 @@
   </div>
   {% endif %}
 </section>
+{% if monthly %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const chartMonths = {{ chart_months|tojson }};
+  const chartTickets = {{ chart_tickets|tojson }};
+  const chartCanvas = document.getElementById("monthlyTicketsChart");
+
+  new Chart(chartCanvas, {
+    type: "bar",
+    data: {
+      labels: chartMonths,
+      datasets: [
+        {
+          label: "Tickets Sold",
+          data: chartTickets,
+          backgroundColor: "rgba(225, 29, 72, 0.72)",
+          borderColor: "rgba(255, 255, 255, 0.8)",
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { precision: 0, color: "#f6f7fb" },
+          grid: { color: "rgba(255, 255, 255, 0.12)" },
+        },
+        x: {
+          ticks: { color: "#f6f7fb" },
+          grid: { color: "rgba(255, 255, 255, 0.08)" },
+        },
+      },
+      plugins: {
+        legend: {
+          labels: { color: "#f6f7fb" },
+        },
+      },
+    },
+  });
+</script>
+{% endif %}
 {% endblock %}

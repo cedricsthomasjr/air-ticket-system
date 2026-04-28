@@ -1,95 +1,99 @@
-SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS review;
-DROP TABLE IF EXISTS ticket;
-DROP TABLE IF EXISTS flight;
-DROP TABLE IF EXISTS airplane;
-DROP TABLE IF EXISTS airline_staff;
-DROP TABLE IF EXISTS customer;
-DROP TABLE IF EXISTS airline;
-SET FOREIGN_KEY_CHECKS = 1;
-
-CREATE TABLE airline (
-    airline_name VARCHAR(100) PRIMARY KEY
+CREATE TABLE Airline (
+    airline_name VARCHAR(50) PRIMARY KEY
 );
 
-CREATE TABLE customer (
-    email VARCHAR(255) PRIMARY KEY,
+CREATE TABLE Airport (
+    airport_code CHAR(3) PRIMARY KEY,
+    city VARCHAR(50) NOT NULL,
+    country VARCHAR(50) NOT NULL,
+    airport_type VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE Customer (
+    email VARCHAR(100) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL,
     name VARCHAR(100) NOT NULL,
-    password CHAR(32) NOT NULL
+    building_number VARCHAR(10),
+    street VARCHAR(100),
+    city VARCHAR(50),
+    state VARCHAR(50),
+    phone_number VARCHAR(20),
+    passport_number VARCHAR(30) NOT NULL,
+    passport_expiration DATE NOT NULL,
+    passport_country VARCHAR(50) NOT NULL,
+    date_of_birth DATE NOT NULL
 );
 
-CREATE TABLE airline_staff (
-    username VARCHAR(100) PRIMARY KEY,
-    password CHAR(32) NOT NULL,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    airline_name VARCHAR(100) NOT NULL,
-    FOREIGN KEY (airline_name) REFERENCES airline(airline_name)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
+CREATE TABLE Airline_Staff (
+    username VARCHAR(50) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    date_of_birth DATE NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    airline_name VARCHAR(50) NOT NULL,
+    FOREIGN KEY (airline_name) REFERENCES Airline(airline_name)
 );
 
-CREATE TABLE airplane (
-    airplane_id INT AUTO_INCREMENT PRIMARY KEY,
-    airline_name VARCHAR(100) NOT NULL,
-    num_seats INT NOT NULL CHECK (num_seats > 0),
-    manufacturer VARCHAR(100),
-    FOREIGN KEY (airline_name) REFERENCES airline(airline_name)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
+CREATE TABLE Staff_Phone (
+    username VARCHAR(50) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    PRIMARY KEY (username, phone_number),
+    FOREIGN KEY (username) REFERENCES Airline_Staff(username)
 );
 
-CREATE TABLE flight (
-    flight_id INT AUTO_INCREMENT PRIMARY KEY,
-    airline_name VARCHAR(100) NOT NULL,
-    source_city VARCHAR(100) NOT NULL,
-    destination_city VARCHAR(100) NOT NULL,
-    source_airport VARCHAR(10) NOT NULL,
-    destination_airport VARCHAR(10) NOT NULL,
-    departure_time DATETIME NOT NULL,
-    arrival_time DATETIME NOT NULL,
-    price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
-    status VARCHAR(20) NOT NULL DEFAULT 'On Time',
-    airplane_id INT,
-    CHECK (status IN ('On Time', 'Delayed', 'Cancelled')),
-    CHECK (arrival_time > departure_time),
-    FOREIGN KEY (airline_name) REFERENCES airline(airline_name)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-    FOREIGN KEY (airplane_id) REFERENCES airplane(airplane_id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL,
-    INDEX idx_flight_departure (departure_time),
-    INDEX idx_flight_route (source_airport, destination_airport),
-    INDEX idx_flight_airline (airline_name)
+CREATE TABLE Airplane (
+    airline_name VARCHAR(50) NOT NULL,
+    airplane_id INT NOT NULL,
+    num_seats INT NOT NULL,
+    manufacturer VARCHAR(50) NOT NULL,
+    manufacture_date DATE NOT NULL,
+    PRIMARY KEY (airline_name, airplane_id),
+    FOREIGN KEY (airline_name) REFERENCES Airline(airline_name)
 );
 
-CREATE TABLE ticket (
-    ticket_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_email VARCHAR(255) NOT NULL,
-    flight_id INT NOT NULL,
-    purchase_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uniq_customer_flight (customer_email, flight_id),
-    FOREIGN KEY (customer_email) REFERENCES customer(email)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    FOREIGN KEY (flight_id) REFERENCES flight(flight_id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
+CREATE TABLE Flight (
+    airline_name VARCHAR(50) NOT NULL,
+    flight_number VARCHAR(20) NOT NULL,
+    departure_datetime DATETIME NOT NULL,
+    departure_airport_code CHAR(3) NOT NULL,
+    arrival_airport_code CHAR(3) NOT NULL,
+    arrival_datetime DATETIME NOT NULL,
+    base_price DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    airplane_id INT NOT NULL,
+    PRIMARY KEY (airline_name, flight_number, departure_datetime),
+    FOREIGN KEY (airline_name) REFERENCES Airline(airline_name),
+    FOREIGN KEY (departure_airport_code) REFERENCES Airport(airport_code),
+    FOREIGN KEY (arrival_airport_code) REFERENCES Airport(airport_code),
+    FOREIGN KEY (airline_name, airplane_id) REFERENCES Airplane(airline_name, airplane_id)
 );
 
-CREATE TABLE review (
-    review_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_email VARCHAR(255) NOT NULL,
-    flight_id INT NOT NULL,
-    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    comment TEXT,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uniq_customer_review (customer_email, flight_id),
-    FOREIGN KEY (customer_email) REFERENCES customer(email)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    FOREIGN KEY (flight_id) REFERENCES flight(flight_id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
+CREATE TABLE Ticket (
+    ticket_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_email VARCHAR(100) NOT NULL,
+    airline_name VARCHAR(50) NOT NULL,
+    flight_number VARCHAR(20) NOT NULL,
+    departure_datetime DATETIME NOT NULL,
+    card_type VARCHAR(10) NOT NULL,
+    card_number VARCHAR(20) NOT NULL,
+    name_on_card VARCHAR(100) NOT NULL,
+    card_expiration DATE NOT NULL,
+    purchase_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_email) REFERENCES Customer(email),
+    FOREIGN KEY (airline_name, flight_number, departure_datetime)
+        REFERENCES Flight(airline_name, flight_number, departure_datetime)
+);
+
+CREATE TABLE Rating (
+    customer_email VARCHAR(100) NOT NULL,
+    airline_name VARCHAR(50) NOT NULL,
+    flight_number VARCHAR(20) NOT NULL,
+    departure_datetime DATETIME NOT NULL,
+    rating INT NOT NULL,
+    comment VARCHAR(500),
+    PRIMARY KEY (customer_email, airline_name, flight_number, departure_datetime),
+    FOREIGN KEY (customer_email) REFERENCES Customer(email),
+    FOREIGN KEY (airline_name, flight_number, departure_datetime)
+        REFERENCES Flight(airline_name, flight_number, departure_datetime)
 );

@@ -41,7 +41,7 @@
   <div class="table-wrap">
     <table>
       <tr>
-        <th>ID</th>
+        <th>Flight</th>
         <th>Route</th>
         <th>Departure</th>
         <th>Arrival</th>
@@ -52,16 +52,19 @@
       </tr>
       {% for flight in flights %}
       <tr>
-        <td>{{ flight['flight_id'] }}</td>
-        <td>{{ flight['source_airport'] }} to {{ flight['destination_airport'] }}</td>
+        <td>{{ flight['flight_number'] }}</td>
+        <td>
+          {{ flight['source_city'] }} ({{ flight['source_airport'] }}) to
+          {{ flight['destination_city'] }} ({{ flight['destination_airport'] }})
+        </td>
         <td>{{ flight['departure_time'] }}</td>
         <td>{{ flight['arrival_time'] }}</td>
         <td>${{ '%.2f'|format(flight['price']) }}</td>
         <td>{{ flight['tickets_sold'] }}</td>
         <td>
-          <form method="POST" action="{{ url_for('update_status', flight_id=flight['flight_id']) }}">
+          <form method="POST" action="{{ url_for('update_status', airline_name=flight['airline_name'], flight_number=flight['flight_number'], departure_datetime=flight['departure_time']) }}">
             <select name="status">
-              {% for status in ['On Time', 'Delayed', 'Cancelled'] %}
+              {% for status in ['on-time', 'delayed', 'cancelled'] %}
               <option value="{{ status }}" {% if flight['status'] == status %}selected{% endif %}>{{ status }}</option>
               {% endfor %}
             </select>
@@ -69,7 +72,7 @@
           </form>
         </td>
         <td>
-          <a class="button-secondary" href="{{ url_for('staff_flight_detail', flight_id=flight['flight_id']) }}">
+          <a class="button-secondary" href="{{ url_for('staff_flight_detail', airline_name=flight['airline_name'], flight_number=flight['flight_number'], departure_datetime=flight['departure_time']) }}">
             Details
           </a>
         </td>

@@ -1,0 +1,25 @@
+# Project Files
+
+- `app.py`: Flask application routes, session handling, role authorization, MySQL prepared queries, and use-case logic.
+- `templates/base.html`: Shared AeroIQ layout, dark red/grey visual system, navigation, animations, and reusable UI styles.
+- `templates/index.html`: Public home page for non-logged-in users.
+- `templates/login.html`: Customer and airline staff login form.
+- `templates/register.html`: Customer and airline staff registration form.
+- `templates/public_search.html`: Public future-flight search page.
+- `templates/customer_home.html`: Customer dashboard.
+- `templates/search_flights.html`: Customer future-flight search and purchase page.
+- `templates/my_flights.html`: Customer purchased-flight itinerary page.
+- `templates/ratings.html`: Dedicated animated page for rating/commenting on completed purchased flights.
+- `templates/staff_home.html`: Airline staff dashboard.
+- `templates/staff_flights.html`: Staff flight list, filters, status updates, and detail links.
+- `templates/create_flight.html`: Staff form for creating flights.
+- `templates/add_airplane.html`: Staff form for adding airplanes and viewing airline-owned airplanes.
+- `templates/staff_flight_detail.html`: Staff view for flight customers, average rating, and comments.
+- `templates/reports.html`: Staff sales/ticket report page.
+- `sql/schema.sql`: MySQL schema based on the Part 2 table definitions.
+- `sql/seed.sql`: Seed data translated for current/future demo dates and MD5 password login.
+- `scripts/import_flights.py`: CSV importer for supported flights into the Part 2 schema.
+- `data/supported_flights.csv`: Example supported-flight import file.
+- `.env.example`: Example MySQL/Flask environment variables.
+- `MYSQL_SETUP.md`: Setup, reset, import, and run instructions.
+- `requirements.txt`: Python dependencies.

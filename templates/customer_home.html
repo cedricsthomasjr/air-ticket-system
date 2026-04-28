@@ -12,18 +12,25 @@
     <a class="button-secondary" href="{{ url_for('my_flights') }}">
       View My Flights
     </a>
+    <a class="button-secondary" href="{{ url_for('ratings') }}">
+      Rate Flights
+    </a>
     <a class="button-secondary" href="{{ url_for('logout') }}">Logout</a>
   </div>
 </section>
 
 <section class="action-grid">
   <a class="action-card" href="{{ url_for('search_flights') }}">
-    <strong>Find Your Next Trip</strong>
-    <p>Filter flights by origin and destination to browse upcoming options.</p>
+    <strong>Open Fare Marketplace</strong>
+    <p>Search flights, compare prices, and lock a fare from one card.</p>
   </a>
   <a class="action-card" href="{{ url_for('my_flights') }}">
     <strong>Review Upcoming Travel</strong>
-    <p>See purchased flights and rate previous trips.</p>
+    <p>See purchased flights and itinerary details.</p>
+  </a>
+  <a class="action-card" href="{{ url_for('ratings') }}">
+    <strong>Rate Past Flights</strong>
+    <p>Score completed trips and send feedback to airline staff.</p>
   </a>
 </section>
 
@@ -34,7 +41,7 @@
   <div class="table-wrap">
     <table>
       <tr>
-        <th>ID</th>
+        <th>Flight</th>
         <th>Airline</th>
         <th>Route</th>
         <th>Departure</th>
@@ -42,7 +49,7 @@
       </tr>
       {% for flight in upcoming %}
       <tr>
-        <td>{{ flight['flight_id'] }}</td>
+        <td>{{ flight['flight_number'] }}</td>
         <td>{{ flight['airline_name'] }}</td>
         <td>{{ flight['source_airport'] }} to {{ flight['destination_airport'] }}</td>
         <td>{{ flight['departure_time'] }}</td>

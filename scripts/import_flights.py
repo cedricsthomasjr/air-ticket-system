@@ -20,7 +20,7 @@ REQUIRED_COLUMNS = {
     "arrival_time",
     "price",
 }
-VALID_STATUSES = {"On Time", "Delayed", "Cancelled"}
+VALID_STATUSES = {"on-time", "delayed", "cancelled"}
 
 
 def parse_datetime(value):
@@ -39,13 +39,21 @@ def validate_columns(fieldnames):
         raise ValueError(f"CSV is missing required columns: {', '.join(sorted(missing))}")
 
 
+def get_next_airplane_id(cursor, airline_name):
+    cursor.execute(
+        "SELECT COALESCE(MAX(airplane_id), 0) + 1 AS next_id FROM Airplane WHERE airline_name = %s",
+        (airline_name,),
+    )
+    return cursor.fetchone()["next_id"]
+
+
 def get_or_create_airplane(cursor, row):
-    airplane_id = (row.get("airplane_id") or "").strip()
     airline_name = row["airline_name"].strip()
+    airplane_id = (row.get("airplane_id") or "").strip()
     if airplane_id:
         cursor.execute(
-            "SELECT airplane_id FROM airplane WHERE airplane_id = %s AND airline_name = %s",
-            (airplane_id, airline_name),
+            "SELECT airplane_id FROM Airplane WHERE airline_name = %s AND airplane_id = %s",
+            (airline_name, airplane_id),
         )
         airplane = cursor.fetchone()
         if not airplane:
@@ -57,7 +65,7 @@ def get_or_create_airplane(cursor, row):
     cursor.execute(
         """
         SELECT airplane_id
-        FROM airplane
+        FROM Airplane
         WHERE airline_name = %s AND num_seats = %s AND manufacturer = %s
         LIMIT 1
         """,
@@ -67,30 +75,28 @@ def get_or_create_airplane(cursor, row):
     if airplane:
         return airplane["airplane_id"]
 
+    airplane_id = get_next_airplane_id(cursor, airline_name)
     cursor.execute(
-        "INSERT INTO airplane (airline_name, num_seats, manufacturer) VALUES (%s, %s, %s)",
-        (airline_name, num_seats, manufacturer),
+        """
+        INSERT INTO Airplane (airline_name, airplane_id, num_seats, manufacturer, manufacture_date)
+        VALUES (%s, %s, %s, %s, %s)
+        """,
+        (airline_name, airplane_id, num_seats, manufacturer, row.get("manufacture_date") or "2020-01-01"),
     )
-    return cursor.lastrowid
+    return airplane_id
 
 
 def flight_exists(cursor, row, departure_time):
     cursor.execute(
         """
-        SELECT flight_id
-        FROM flight
+        SELECT 1
+        FROM Flight
         WHERE airline_name = %s
-          AND source_airport = %s
-          AND destination_airport = %s
-          AND departure_time = %s
+          AND flight_number = %s
+          AND departure_datetime = %s
         LIMIT 1
         """,
-        (
-            row["airline_name"].strip(),
-            row["source_airport"].strip().upper(),
-            row["destination_airport"].strip().upper(),
-            departure_time,
-        ),
+        (row["airline_name"].strip(), row["flight_number"].strip(), departure_time),
     )
     return cursor.fetchone() is not None
 
@@ -108,18 +114,44 @@ def import_flights(csv_path, skip_duplicates=True):
         for line_number, row in enumerate(reader, start=2):
             try:
                 airline_name = row["airline_name"].strip()
-                status = (row.get("status") or "On Time").strip()
+                status = (row.get("status") or "on-time").strip().lower()
+                if status == "on time":
+                    status = "on-time"
                 if status not in VALID_STATUSES:
                     raise ValueError(f"Status must be one of {', '.join(sorted(VALID_STATUSES))}.")
+
+                if not (row.get("flight_number") or "").strip():
+                    row["flight_number"] = f"{airline_name[:2].upper()}{line_number:03d}"
 
                 departure_time = parse_datetime(row["departure_time"])
                 arrival_time = parse_datetime(row["arrival_time"])
                 if arrival_time <= departure_time:
                     raise ValueError("Arrival time must be after departure time.")
 
+                cursor.execute("INSERT IGNORE INTO Airline (airline_name) VALUES (%s)", (airline_name,))
                 cursor.execute(
-                    "INSERT IGNORE INTO airline (airline_name) VALUES (%s)",
-                    (airline_name,),
+                    """
+                    INSERT IGNORE INTO Airport (airport_code, city, country, airport_type)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (
+                        row["source_airport"].strip().upper(),
+                        row["source_city"].strip(),
+                        row.get("source_country") or "USA",
+                        row.get("source_airport_type") or "domestic",
+                    ),
+                )
+                cursor.execute(
+                    """
+                    INSERT IGNORE INTO Airport (airport_code, city, country, airport_type)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (
+                        row["destination_airport"].strip().upper(),
+                        row["destination_city"].strip(),
+                        row.get("destination_country") or "USA",
+                        row.get("destination_airport_type") or "domestic",
+                    ),
                 )
                 airplane_id = get_or_create_airplane(cursor, row)
 
@@ -129,19 +161,18 @@ def import_flights(csv_path, skip_duplicates=True):
 
                 cursor.execute(
                     """
-                    INSERT INTO flight (
-                        airline_name, source_city, destination_city, source_airport, destination_airport,
-                        departure_time, arrival_time, price, status, airplane_id
+                    INSERT INTO Flight (
+                        airline_name, flight_number, departure_datetime, departure_airport_code,
+                        arrival_airport_code, arrival_datetime, base_price, status, airplane_id
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
                     (
                         airline_name,
-                        row["source_city"].strip(),
-                        row["destination_city"].strip(),
+                        row["flight_number"].strip(),
+                        departure_time,
                         row["source_airport"].strip().upper(),
                         row["destination_airport"].strip().upper(),
-                        departure_time,
                         arrival_time,
                         row["price"].strip(),
                         status,
@@ -162,23 +193,15 @@ def import_flights(csv_path, skip_duplicates=True):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Import supported flights from CSV into MySQL.")
+    parser = argparse.ArgumentParser(description="Import supported flights from CSV into the Part 2 MySQL schema.")
     parser.add_argument(
         "csv_path",
         nargs="?",
         default=os.path.join(PROJECT_ROOT, "data", "supported_flights.csv"),
         help="Path to CSV file. Defaults to data/supported_flights.csv.",
     )
-    parser.add_argument(
-        "--init-db",
-        action="store_true",
-        help="Create/reset the MySQL database from sql/schema.sql and sql/seed.sql before importing.",
-    )
-    parser.add_argument(
-        "--allow-duplicates",
-        action="store_true",
-        help="Insert flights even if the same airline, route, and departure time already exists.",
-    )
+    parser.add_argument("--init-db", action="store_true", help="Reset MySQL before importing.")
+    parser.add_argument("--allow-duplicates", action="store_true", help="Insert duplicate flights too.")
     args = parser.parse_args()
 
     if args.init_db:

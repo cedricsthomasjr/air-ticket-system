@@ -1,4 +1,4 @@
-airline_name,source_city,destination_city,source_airport,destination_airport,departure_time,arrival_time,price,status,num_seats,manufacturer
-SkyJet,New York,San Francisco,JFK,SFO,2026-05-15 08:00:00,2026-05-15 11:30:00,285.00,On Time,180,Boeing
-SkyJet,Boston,Los Angeles,BOS,LAX,2026-05-16 10:45:00,2026-05-16 14:15:00,340.00,On Time,180,Boeing
-BlueCloud,Newark,Orlando,EWR,MCO,2026-05-17 13:20:00,2026-05-17 16:05:00,195.00,Delayed,220,Airbus
+airline_name,flight_number,source_city,destination_city,source_airport,destination_airport,departure_time,arrival_time,price,status,num_seats,manufacturer
+JetBlue,JB301,New York,San Francisco,JFK,SFO,2026-05-15 08:00:00,2026-05-15 11:30:00,285.00,on-time,180,Boeing
+JetBlue,JB302,Boston,Los Angeles,BOS,LAX,2026-05-16 10:45:00,2026-05-16 14:15:00,340.00,on-time,180,Boeing
+JetBlue,JB303,New York,Orlando,JFK,MCO,2026-05-17 13:20:00,2026-05-17 16:05:00,195.00,delayed,200,Airbus

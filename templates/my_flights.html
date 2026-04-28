@@ -6,7 +6,35 @@
 
   <div class="pill-nav">
     <a class="button-secondary" href="{{ url_for('customer_home') }}">Back</a>
+    <a class="button" href="{{ url_for('ratings') }}">Rate Past Flights</a>
   </div>
+</section>
+
+<section class="panel">
+  <form method="GET">
+    <div class="form-grid">
+      <div class="field">
+        <label for="start_date">Start Date</label>
+        <input id="start_date" type="date" name="start_date" value="{{ request.args.get('start_date', '') }}" />
+      </div>
+      <div class="field">
+        <label for="end_date">End Date</label>
+        <input id="end_date" type="date" name="end_date" value="{{ request.args.get('end_date', '') }}" />
+      </div>
+      <div class="field">
+        <label for="source">Source City or Airport</label>
+        <input id="source" type="text" name="source" value="{{ request.args.get('source', '') }}" />
+      </div>
+      <div class="field">
+        <label for="destination">Destination City or Airport</label>
+        <input id="destination" type="text" name="destination" value="{{ request.args.get('destination', '') }}" />
+      </div>
+    </div>
+    <div class="inline-actions">
+      <button type="submit">Filter</button>
+      <a class="button-secondary" href="{{ url_for('my_flights') }}">Clear</a>
+    </div>
+  </form>
 </section>
 
 <section class="panel">
@@ -14,19 +42,21 @@
   <div class="table-wrap">
     <table>
       <tr>
-        <th>ID</th>
+        <th>Flight</th>
         <th>Airline</th>
         <th>Route</th>
         <th>Departure</th>
         <th>Arrival</th>
         <th>Status</th>
-        <th>Rating</th>
       </tr>
       {% for flight in flights %}
       <tr>
-        <td>{{ flight['flight_id'] }}</td>
+        <td>{{ flight['flight_number'] }}</td>
         <td>{{ flight['airline_name'] }}</td>
-        <td>{{ flight['source_airport'] }} to {{ flight['destination_airport'] }}</td>
+        <td>
+          {{ flight['source_city'] }} ({{ flight['source_airport'] }}) to
+          {{ flight['destination_city'] }} ({{ flight['destination_airport'] }})
+        </td>
         <td>{{ flight['departure_time'] }}</td>
         <td>{{ flight['arrival_time'] }}</td>
         <td>
@@ -35,25 +65,6 @@
           >
             {{ flight['status'] }}
           </span>
-        </td>
-        <td>
-          {% if flight['departure_time'] < now %}
-          <form method="POST" action="{{ url_for('review_flight', flight_id=flight['flight_id']) }}">
-            <div class="field">
-              <select name="rating" required>
-                {% for rating in range(1, 6) %}
-                <option value="{{ rating }}" {% if flight['rating'] == rating %}selected{% endif %}>{{ rating }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="field">
-              <textarea name="comment" placeholder="Comment">{{ flight['comment'] or '' }}</textarea>
-            </div>
-            <button type="submit">Save</button>
-          </form>
-          {% else %}
-          <span class="muted">Available after travel</span>
-          {% endif %}
         </td>
       </tr>
       {% endfor %}

@@ -9,27 +9,23 @@
   <form method="POST">
     <div class="form-grid">
       <div class="field">
-        <label for="source_city">Source City</label>
-        <input id="source_city" type="text" name="source_city" placeholder="New York" />
+        <label for="flight_number">Flight Number</label>
+        <input id="flight_number" type="text" name="flight_number" placeholder="JB450" required />
       </div>
 
       <div class="field">
-        <label for="destination_city">Destination City</label>
-        <input id="destination_city" type="text" name="destination_city" placeholder="Los Angeles" />
+        <label for="departure_airport_code">Departure Airport Code</label>
+        <input id="departure_airport_code" type="text" name="departure_airport_code" maxlength="3" placeholder="JFK" required />
       </div>
 
       <div class="field">
-        <label for="source">Source Airport</label>
-        <input id="source" type="text" name="source" placeholder="JFK" required />
-      </div>
-
-      <div class="field">
-        <label for="destination">Destination Airport</label>
+        <label for="arrival_airport_code">Arrival Airport Code</label>
         <input
-          id="destination"
+          id="arrival_airport_code"
           type="text"
-          name="destination"
-          placeholder="LAX"
+          name="arrival_airport_code"
+          maxlength="3"
+          placeholder="PVG"
           required
         />
       </div>
@@ -53,7 +49,7 @@
         <label for="airplane_id">Airplane</label>
         <select id="airplane_id" name="airplane_id" required>
           {% for plane in airplanes %}
-          <option value="{{ plane['airplane_id'] }}">{{ plane['airplane_id'] }}</option>
+          <option value="{{ plane['airplane_id'] }}">{{ plane['airplane_id'] }} - {{ plane['manufacturer'] }}</option>
           {% endfor %}
         </select>
       </div>

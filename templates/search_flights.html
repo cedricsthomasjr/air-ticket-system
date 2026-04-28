@@ -1,116 +1,17 @@
 {% extends 'base.html' %} {% block content %}
 <section class="hero">
-  <p class="eyebrow">Flight Search</p>
-  <h1>Find upcoming flights</h1>
+  <p class="eyebrow">Customer Fare Marketplace</p>
+  <h1>Find a flight and lock the fare instantly</h1>
   <p>
-    Enter a departure and destination city or airport to browse matching future
-    routes, then purchase tickets directly from the results.
+    Search by city, airport, and dates. Every result is purchase-ready from the
+    same card, so checkout stays one click away.
   </p>
 </section>
 
-<section class="panel">
-  <form method="POST">
-    <div class="form-grid">
-      <div class="field">
-        <label for="source">Source City or Airport</label>
-        <input
-          id="source"
-          type="text"
-          name="source"
-          placeholder="JFK"
-          value="{{ request.form.get('source', '') }}"
-        />
-      </div>
-      <div class="field">
-        <label for="destination">Destination City or Airport</label>
-        <input
-          id="destination"
-          type="text"
-          name="destination"
-          placeholder="LAX"
-          value="{{ request.form.get('destination', '') }}"
-        />
-      </div>
-      <div class="field">
-        <label for="departure_date">Departure Date</label>
-        <input
-          id="departure_date"
-          type="date"
-          name="departure_date"
-          value="{{ request.form.get('departure_date', '') }}"
-        />
-      </div>
-      <div class="field">
-        <label for="return_date">Return Date</label>
-        <input
-          id="return_date"
-          type="date"
-          name="return_date"
-          value="{{ request.form.get('return_date', '') }}"
-        />
-      </div>
-    </div>
+{% set back_url = url_for('customer_home') %}
+{% set submit_label = 'Hunt Fares' %}
+{% include 'partials/flight_search_form.html' %}
 
-    <div class="inline-actions">
-      <button type="submit">Search Flights</button>
-      <a class="button-secondary" href="{{ url_for('customer_home') }}">Back</a>
-    </div>
-  </form>
-</section>
-
-<section class="panel">
-  <p class="eyebrow">Results</p>
-  <h2>{{ flights|length }} matching flight{{ '' if flights|length == 1 else 's' }}</h2>
-
-  {% if flights %}
-  <div class="table-wrap">
-    <table>
-      <tr>
-        <th>ID</th>
-        <th>Airline</th>
-        <th>Route</th>
-        <th>Departure</th>
-        <th>Arrival</th>
-        <th>Price</th>
-        <th>Seats</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-      {% for flight in flights %}
-      <tr>
-        <td>{{ flight['flight_id'] }}</td>
-        <td>{{ flight['airline_name'] }}</td>
-        <td>{{ flight['source_airport'] }} to {{ flight['destination_airport'] }}</td>
-        <td>{{ flight['departure_time'] }}</td>
-        <td>{{ flight['arrival_time'] }}</td>
-        <td>${{ '%.2f'|format(flight['price']) }}</td>
-        <td>{{ flight['seats_available'] if flight['seats_available'] is not none else 'N/A' }}</td>
-        <td>
-          <span
-            class="status-chip {% if flight['status']|lower == 'delayed' %}delayed{% elif flight['status']|lower == 'cancelled' %}cancelled{% endif %}"
-          >
-            {{ flight['status'] }}
-          </span>
-        </td>
-        <td>
-          <form method="POST" action="{{ url_for('purchase_ticket', flight_id=flight['flight_id']) }}">
-            <button type="submit">Purchase</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
-  {% elif request.method == 'POST' %}
-  <div class="empty-state">
-    <strong>No flights matched this search.</strong>
-    <p>Try broadening the airport codes or leaving one field blank.</p>
-  </div>
-  {% else %}
-  <div class="empty-state">
-    <strong>Search results will appear here.</strong>
-    <p>Start with an airport code like <code>JFK</code>, <code>EWR</code>, or <code>LAX</code>.</p>
-  </div>
-  {% endif %}
-</section>
+{% set result_label = 'matching fare' %}
+{% include 'partials/flight_market.html' %}
 {% endblock %}

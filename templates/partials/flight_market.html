@@ -1,0 +1,101 @@
+<section class="deal-strip">
+  <div>
+    <p class="eyebrow">Fare Drop Console</p>
+    <strong>{{ flights|length }} {{ result_label|default('flight') }}{{ '' if flights|length == 1 else 's' }} ready to book</strong>
+    <p>Search, compare, and move straight into checkout from the same surface.</p>
+  </div>
+  {% if session.get('user_type') == 'customer' %}
+  <span class="urgency-badge">One-click customer checkout</span>
+  {% else %}
+  <span class="urgency-badge">Login unlocks purchase</span>
+  {% endif %}
+</section>
+
+{% if flights %}
+<section class="market-grid">
+  {% for flight in flights %}
+  <article class="fare-card" style="animation-delay: {{ loop.index0 * 80 }}ms">
+    <div class="fare-head">
+      <div>
+        <p class="eyebrow">{{ flight['airline_name'] }}</p>
+        <h2>{{ flight['flight_number'] }}</h2>
+        <span class="fare-small">{{ flight['departure_time'] }}</span>
+      </div>
+      <span class="urgency-badge">
+        {{ flight['seats_available'] if flight['seats_available'] is not none else 'Open' }} seats left
+      </span>
+    </div>
+
+    <div class="fare-route">
+      <div>
+        <span class="airport-code">{{ flight['source_airport'] }}</span>
+        <div class="fare-city">{{ flight['source_city'] }}</div>
+      </div>
+      <span class="route-line"></span>
+      <div>
+        <span class="airport-code">{{ flight['destination_airport'] }}</span>
+        <div class="fare-city">{{ flight['destination_city'] }}</div>
+      </div>
+    </div>
+
+    <div class="fare-footer">
+      <div class="rating-meta">
+        <span class="metric-pill">{{ flight['status_label'] or flight['status'] }}</span>
+        <span class="metric-pill">Arrives {{ flight['arrival_time'] }}</span>
+      </div>
+      <div class="fare-price">
+        <strong>${{ '%.2f'|format(flight['price']) }}</strong>
+        <span>base fare</span>
+      </div>
+    </div>
+
+    <div class="checkout-stack">
+      {% if session.get('user_type') == 'customer' %}
+      <form method="POST" action="{{ url_for('purchase_ticket') }}">
+        <input type="hidden" name="airline_name" value="{{ flight['airline_name'] }}" />
+        <input type="hidden" name="flight_number" value="{{ flight['flight_number'] }}" />
+        <input type="hidden" name="departure_datetime" value="{{ flight['departure_time'] }}" />
+        <div class="form-grid">
+          <div class="field">
+            <label for="card_type_{{ loop.index }}">Card Type</label>
+            <select id="card_type_{{ loop.index }}" name="card_type" required>
+              <option value="credit">credit</option>
+              <option value="debit">debit</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="card_number_{{ loop.index }}">Card Number</label>
+            <input id="card_number_{{ loop.index }}" type="text" name="card_number" maxlength="20" required />
+          </div>
+          <div class="field">
+            <label for="name_on_card_{{ loop.index }}">Name on Card</label>
+            <input id="name_on_card_{{ loop.index }}" type="text" name="name_on_card" required />
+          </div>
+          <div class="field">
+            <label for="card_expiration_{{ loop.index }}">Card Expiration</label>
+            <input id="card_expiration_{{ loop.index }}" type="date" name="card_expiration" required />
+          </div>
+        </div>
+        <button type="submit">Lock Fare Now</button>
+      </form>
+      <span class="purchase-note">Payment details are stored with the ticket purchase record.</span>
+      {% elif session.get('user_type') == 'staff' %}
+      <span class="button-secondary">Staff View Only</span>
+      <span class="purchase-note">Customer accounts can purchase directly from this same result card.</span>
+      {% else %}
+      <a class="button" href="{{ url_for('login') }}">Login to Purchase</a>
+      <a class="button-secondary" href="{{ url_for('register') }}">Create Account</a>
+      <span class="purchase-note">Create a customer account to reserve this fare instantly.</span>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</section>
+{% elif request.method == 'POST' %}
+<section class="panel">
+  <div class="empty-state">
+    <strong>No flights matched this search.</strong>
+    <p>Try fewer filters or leave a field blank to see more bookable fares.</p>
+  </div>
+</section>
+{% endif %}

@@ -1,0 +1,51 @@
+<section class="panel">
+  <form method="POST">
+    <div class="form-grid">
+      <div class="field">
+        <label for="source">Source City or Airport</label>
+        <input
+          id="source"
+          type="text"
+          name="source"
+          placeholder="JFK or New York"
+          value="{{ request.form.get('source', '') }}"
+        />
+      </div>
+      <div class="field">
+        <label for="destination">Destination City or Airport</label>
+        <input
+          id="destination"
+          type="text"
+          name="destination"
+          placeholder="LAX or Shanghai"
+          value="{{ request.form.get('destination', '') }}"
+        />
+      </div>
+      <div class="field">
+        <label for="departure_date">Departure Date</label>
+        <input
+          id="departure_date"
+          type="date"
+          name="departure_date"
+          value="{{ request.form.get('departure_date', '') }}"
+        />
+      </div>
+      <div class="field">
+        <label for="return_date">Return Date</label>
+        <input
+          id="return_date"
+          type="date"
+          name="return_date"
+          value="{{ request.form.get('return_date', '') }}"
+        />
+      </div>
+    </div>
+
+    <div class="inline-actions">
+      <button type="submit">{{ submit_label|default('Find Fares') }}</button>
+      {% if back_url %}
+      <a class="button-secondary" href="{{ back_url }}">Back</a>
+      {% endif %}
+    </div>
+  </form>
+</section>

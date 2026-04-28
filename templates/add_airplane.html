@@ -16,6 +16,10 @@
         <label for="manufacturer">Manufacturer</label>
         <input id="manufacturer" type="text" name="manufacturer" placeholder="Boeing" />
       </div>
+      <div class="field">
+        <label for="manufacture_date">Manufacture Date</label>
+        <input id="manufacture_date" type="date" name="manufacture_date" />
+      </div>
     </div>
     <div class="inline-actions">
       <button type="submit">Add Airplane</button>
@@ -33,12 +37,14 @@
         <th>ID</th>
         <th>Seats</th>
         <th>Manufacturer</th>
+        <th>Manufacture Date</th>
       </tr>
       {% for airplane in airplanes %}
       <tr>
         <td>{{ airplane['airplane_id'] }}</td>
         <td>{{ airplane['num_seats'] }}</td>
         <td>{{ airplane['manufacturer'] or 'N/A' }}</td>
+        <td>{{ airplane['manufacture_date'] }}</td>
       </tr>
       {% endfor %}
     </table>

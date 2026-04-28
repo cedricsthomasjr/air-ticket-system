@@ -1,0 +1,88 @@
+{% extends 'base.html' %} {% block content %}
+<section class="hero">
+  <p class="eyebrow">Experience Intelligence</p>
+  <h1>Rate completed flights</h1>
+  <p>
+    Turn past travel into airline insight. Each review becomes part of the
+    operations feedback loop visible to airline staff.
+  </p>
+
+  <div class="pill-nav">
+    <a class="button-secondary" href="{{ url_for('customer_home') }}">Back</a>
+    <a class="button-secondary" href="{{ url_for('my_flights') }}">My Flights</a>
+  </div>
+</section>
+
+{% if flights %}
+<section class="rating-grid">
+  {% for flight in flights %}
+  {% set card_id = loop.index %}
+  <article class="rating-card" style="animation-delay: {{ loop.index0 * 90 }}ms">
+    <div class="rating-route">
+      <span class="airport-code">{{ flight['source_airport'] }}</span>
+      <span class="route-line"></span>
+      <span class="airport-code">{{ flight['destination_airport'] }}</span>
+    </div>
+
+    <div>
+      <p class="eyebrow">{{ flight['airline_name'] }}</p>
+      <h2>{{ flight['source_city'] }} to {{ flight['destination_city'] }}</h2>
+      <p>
+        Departed {{ flight['departure_time'] }} and arrived
+        {{ flight['arrival_time'] }}.
+      </p>
+    </div>
+
+    <div class="rating-meta">
+      <span class="metric-pill">Flight {{ flight['flight_number'] }}</span>
+      <span class="metric-pill">{{ flight['status'] }}</span>
+      {% if flight['rating'] %}
+      <span class="metric-pill">Current score: {{ flight['rating'] }}/5</span>
+      {% else %}
+      <span class="metric-pill">Awaiting score</span>
+      {% endif %}
+    </div>
+
+    <form method="POST" action="{{ url_for('review_flight', flight_key=flight['flight_key']) }}">
+      <div class="field">
+        <label>Experience Score</label>
+        <div class="rating-options">
+          {% for rating in range(1, 6) %}
+          <input
+            id="rating-{{ card_id }}-{{ rating }}"
+            type="radio"
+            name="rating"
+            value="{{ rating }}"
+            {% if flight['rating'] == rating or (not flight['rating'] and rating == 5) %}checked{% endif %}
+          />
+          <label for="rating-{{ card_id }}-{{ rating }}">{{ rating }}</label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="comment-{{ card_id }}">Comment</label>
+        <textarea
+          id="comment-{{ card_id }}"
+          name="comment"
+          placeholder="Share what worked, what lagged, or what the airline should improve."
+        >{{ flight['comment'] or '' }}</textarea>
+      </div>
+
+      <div class="inline-actions">
+        <button type="submit">Save Rating</button>
+        <span class="muted">Stored in the Part 2 Rating table</span>
+      </div>
+    </form>
+  </article>
+  {% endfor %}
+</section>
+{% else %}
+<section class="panel">
+  <div class="empty-state">
+    <strong>No completed flights are ready for rating.</strong>
+    <p>After a purchased flight has departed, it will appear here.</p>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

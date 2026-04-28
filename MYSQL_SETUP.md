@@ -1,6 +1,6 @@
 # MySQL Setup and Flight Import
 
-This version of the app uses MySQL through `mysql-connector-python`.
+This version of the app uses MySQL through `mysql-connector-python` and the Part 2 table definitions in `sql/schema.sql`.
 
 ## 1. Configure MySQL
 
@@ -60,10 +60,12 @@ Required CSV columns:
 
 Optional CSV columns:
 
+- `flight_number`
 - `status`
 - `airplane_id`
 - `num_seats`
 - `manufacturer`
+- `manufacture_date`
 
 If `airplane_id` is blank, the importer finds or creates an airplane for that airline using `num_seats` and `manufacturer`.
 
@@ -75,5 +77,5 @@ venv/bin/python -m flask --app app run --port 5001
 
 Demo accounts after seeding:
 
-- Customer: `cj@example.com / test123`
-- Staff: `staff1 / admin123`
+- Customer: `cj@nyu.edu / pass123`
+- Staff: `admin1 / adminpass`

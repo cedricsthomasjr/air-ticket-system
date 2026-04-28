@@ -1,184 +1,65 @@
-# Air Ticket Reservation System (Part 3 Progress Report)
+# Air Ticket Reservation System
 
-## Overview
-
-This project is a web-based Air Ticket Reservation System that allows both customers and airline staff to interact with flight data through a centralized platform.
-
-The system supports:
-
-* Customer flight search and booking history
-* Airline staff flight management
-* Role-based access control
-* Session-based authentication
-
-This implementation focuses on building the core backend logic, database schema, and essential user flows required for the final project.
-
----
+Flask + MySQL web app for the Intro to Databases air ticket reservation project.
 
 ## Tech Stack
 
-* **Backend:** Python (Flask)
-* **Database (Current):** SQLite
-* **Templating:** Jinja2 (HTML)
-* **Environment Management:** python-dotenv
+* **Backend:** Python and Flask
+* **Database:** MySQL
+* **Templating:** Jinja2 HTML
+* **Configuration:** python-dotenv
 
----
+## Database
 
-## Database Design
+The database is MySQL and uses the Part 2 schema in `sql/schema.sql`. Seed data lives in `sql/seed.sql`.
 
-The system uses a relational schema with the following tables:
-
-* `airline`
-* `customer`
-* `airline_staff`
-* `airplane`
-* `flight`
-* `ticket`
-
-Relationships:
-
-* Customers purchase tickets for flights
-* Flights are operated by airlines
-* Airline staff manage flights and airplanes
-
-The schema is initialized automatically in the application using `init_db()`.
-
----
-
-## Features Implemented
-
-### Authentication
-
-* Login system for both customers and airline staff
-* Session-based authentication
-* Role-based access control
-
-### Customer Features
-
-* Search for future flights
-* View purchased flights
-
-### Airline Staff Features
-
-* View upcoming flights (next 30 days)
-* Create new flights
-
----
-
-## Dummy Data
-
-Sample data is automatically generated when the database is initialized.
-
-Includes:
-
-* Airlines (SkyJet, BlueCloud)
-* Customers
-* Airline staff accounts
-* Flights and tickets
-
-You can reset the database at any time by visiting:
+The app can initialize or reset the configured MySQL database from those files:
 
 ```
 /reset-db
 ```
 
----
-
-## How to Run the Project
-
-1. Navigate to project folder:
+Default database settings can be supplied with environment variables:
 
 ```
-cd air-ticket-system
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=
+MYSQL_DATABASE=air_ticket_system
+SECRET_KEY=dev_secret
 ```
 
-2. Activate virtual environment:
-
-```
-source venv/bin/activate
-```
-
-3. Install dependencies:
+## How to Run
 
 ```
 pip install -r requirements.txt
-```
-
-4. Run the app:
-
-```
 python app.py
 ```
 
-5. Open in browser:
+Open:
 
 ```
 http://127.0.0.1:5000
 ```
 
----
+## Demo Credentials
 
-## Test Credentials
-
-### Customer
-
-* Email: `cj@example.com`
-* Password: `test123`
-
-### Airline Staff
-
-* Username: `staff1`
-* Password: `admin123`
-
----
-
-## Progress Report Notes
-
-For rapid development and testing, the current implementation uses **SQLite** as the database.
-
-However, the system has been designed using a relational schema and SQL queries that are fully compatible with **MySQL**, which will be integrated in the final version of the project.
-
-This approach allows for:
-
-* Faster prototyping
-* Easier debugging
-* Immediate testing of application logic
-
----
-
-## Next Steps (Planned Features)
-
-* Ticket purchasing functionality
-* Flight status updates (staff)
-* Add airplane functionality
-* Customer ratings and comments
-* Reporting dashboard (tickets sold, analytics)
-
----
-
-## File Structure
+Customer:
 
 ```
-air-ticket-system/
-├── app.py
-├── air_ticket_system.db
-├── requirements.txt
-├── .env
-└── templates/
-    ├── base.html
-    ├── login.html
-    ├── customer_home.html
-    ├── staff_home.html
-    ├── search_flights.html
-    ├── my_flights.html
-    ├── staff_flights.html
-    └── create_flight.html
+cj@nyu.edu / pass123
 ```
 
----
+Airline staff:
 
-## Summary
+```
+admin1 / adminpass
+```
 
-This progress report demonstrates a functional backend system with working routes, database schema, and user interactions. Core features for both customers and airline staff have been implemented and tested, forming a strong foundation for the final project.
+## Main Features
 
----
+* Public flight search
+* Customer registration, login, flight search, ticket purchase, itinerary filtering, and ratings
+* Airline staff registration, flight management, status updates, airplane creation, flight details, and reports
+* MySQL-backed schema with composite flight keys matching the Part 2 design

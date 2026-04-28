@@ -1,30 +1,36 @@
-INSERT INTO airline (airline_name) VALUES
-('SkyJet'),
-('BlueCloud');
+INSERT INTO Airline VALUES ('JetBlue');
 
-INSERT INTO customer (email, name, password) VALUES
-('cj@example.com', 'CJ Thomas', 'cc03e747a6afbbcbf8be7668acfebee5'),
-('alex@example.com', 'Alex Johnson', 'cc03e747a6afbbcbf8be7668acfebee5');
+INSERT INTO Airport VALUES
+('JFK', 'New York', 'USA', 'international'),
+('PVG', 'Shanghai', 'China', 'international');
 
-INSERT INTO airline_staff (username, password, first_name, last_name, airline_name) VALUES
-('staff1', '0192023a7bbd73250516f069df18b500', 'Maya', 'Lee', 'SkyJet'),
-('staff2', '0192023a7bbd73250516f069df18b500', 'Chris', 'Wong', 'BlueCloud');
+INSERT INTO Customer VALUES
+('cj@nyu.edu', MD5('pass123'), 'CJ Thomas', '123', 'Main St', 'New York', 'NY', '1112223333', 'P123456', '2030-01-01', 'USA', '2003-05-10'),
+('brooke@email.com', MD5('pass123'), 'Brooke Smith', '456', 'Park Ave', 'New York', 'NY', '2223334444', 'P654321', '2029-06-15', 'USA', '2002-08-20'),
+('john@email.com', MD5('pass123'), 'John Doe', '789', 'Broadway', 'New York', 'NY', '3334445555', 'P999888', '2031-09-30', 'USA', '1998-12-12');
 
-INSERT INTO airplane (airplane_id, airline_name, num_seats, manufacturer) VALUES
-(1, 'SkyJet', 180, 'Boeing'),
-(2, 'BlueCloud', 220, 'Airbus'),
-(3, 'SkyJet', 90, 'Embraer');
+INSERT INTO Airline_Staff VALUES
+('admin1', MD5('adminpass'), 'Alice', 'Brown', '1985-04-10', 'alice@jetblue.com', 'JetBlue');
 
-INSERT INTO flight (
-    airline_name, source_city, destination_city, source_airport, destination_airport,
-    departure_time, arrival_time, price, status, airplane_id
-) VALUES
-('SkyJet', 'New York', 'Los Angeles', 'JFK', 'LAX', DATE_ADD(CURDATE(), INTERVAL 7 DAY) + INTERVAL 9 HOUR, DATE_ADD(CURDATE(), INTERVAL 7 DAY) + INTERVAL 12 HOUR, 320.00, 'On Time', 1),
-('SkyJet', 'New York', 'Miami', 'JFK', 'MIA', DATE_ADD(CURDATE(), INTERVAL 8 DAY) + INTERVAL 14 HOUR, DATE_ADD(CURDATE(), INTERVAL 8 DAY) + INTERVAL 17 HOUR, 180.00, 'Delayed', 1),
-('BlueCloud', 'Newark', 'Atlanta', 'EWR', 'ATL', DATE_ADD(CURDATE(), INTERVAL 9 DAY) + INTERVAL 8 HOUR + INTERVAL 30 MINUTE, DATE_ADD(CURDATE(), INTERVAL 9 DAY) + INTERVAL 11 HOUR, 210.00, 'On Time', 2),
-('SkyJet', 'New York', 'Chicago', 'JFK', 'ORD', DATE_SUB(CURDATE(), INTERVAL 30 DAY) + INTERVAL 9 HOUR, DATE_SUB(CURDATE(), INTERVAL 30 DAY) + INTERVAL 11 HOUR + INTERVAL 20 MINUTE, 150.00, 'On Time', 3);
+INSERT INTO Staff_Phone VALUES
+('admin1', '9998887777'),
+('admin1', '8887776666');
 
-INSERT INTO ticket (customer_email, flight_id) VALUES
-('cj@example.com', 1),
-('cj@example.com', 4),
-('alex@example.com', 3);
+INSERT INTO Airplane VALUES
+('JetBlue', 1, 180, 'Boeing', '2015-03-01'),
+('JetBlue', 2, 200, 'Airbus', '2018-07-15'),
+('JetBlue', 3, 150, 'Boeing', '2020-11-20');
+
+INSERT INTO Flight VALUES
+('JetBlue', 'JB101', '2026-06-01 08:00:00', 'JFK', 'PVG', '2026-06-01 20:00:00', 800.00, 'on-time', 1),
+('JetBlue', 'JB102', '2026-06-10 09:00:00', 'PVG', 'JFK', '2026-06-10 21:00:00', 850.00, 'delayed', 2),
+('JetBlue', 'JB103', '2025-12-01 10:00:00', 'JFK', 'PVG', '2025-12-01 22:00:00', 750.00, 'on-time', 3);
+
+INSERT INTO Ticket VALUES
+(1, 'cj@nyu.edu', 'JetBlue', 'JB101', '2026-06-01 08:00:00', 'credit', '123456789012', 'CJ Thomas', '2028-01-01', '2026-03-01 12:00:00'),
+(2, 'brooke@email.com', 'JetBlue', 'JB102', '2026-06-10 09:00:00', 'debit', '987654321098', 'Brooke Smith', '2027-05-01', '2026-03-02 13:00:00'),
+(3, 'john@email.com', 'JetBlue', 'JB103', '2025-12-01 10:00:00', 'credit', '111122223333', 'John Doe', '2029-09-01', '2025-11-20 14:00:00');
+
+INSERT INTO Rating VALUES
+('john@email.com', 'JetBlue', 'JB103', '2025-12-01 10:00:00', 4, 'Good flight'),
+('cj@nyu.edu', 'JetBlue', 'JB101', '2026-06-01 08:00:00', 5, 'Excellent service');
