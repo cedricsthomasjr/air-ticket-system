@@ -1,28 +1,87 @@
 {% extends 'base.html' %} {% block content %}
-<h1>Flights for Next 30 Days</h1>
-<table>
-  <tr>
-    <th>ID</th>
-    <th>Source</th>
-    <th>Destination</th>
-    <th>Departure</th>
-    <th>Arrival</th>
-    <th>Price</th>
-    <th>Status</th>
-  </tr>
-  {% for flight in flights %}
-  <tr>
-    <td>{{ flight['flight_id'] }}</td>
-    <td>{{ flight['source_airport'] }}</td>
-    <td>{{ flight['destination_airport'] }}</td>
-    <td>{{ flight['departure_time'] }}</td>
-    <td>{{ flight['arrival_time'] }}</td>
-    <td>{{ flight['price'] }}</td>
-    <td>{{ flight['status'] }}</td>
-  </tr>
-  {% endfor %}
-</table>
+<section class="hero">
+  <p class="eyebrow">Staff Flights</p>
+  <h1>Flights for your airline</h1>
+  <p>Defaults to the next 30 days, with filters for date and route.</p>
 
-<br />
-<a href="{{ url_for('staff_home') }}">Back</a>
+  <div class="pill-nav">
+    <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
+    <a class="button" href="{{ url_for('create_flight') }}">Create New Flight</a>
+  </div>
+</section>
+
+<section class="panel">
+  <form method="GET">
+    <div class="form-grid">
+      <div class="field">
+        <label for="start_date">Start Date</label>
+        <input id="start_date" type="date" name="start_date" value="{{ start_date }}" />
+      </div>
+      <div class="field">
+        <label for="end_date">End Date</label>
+        <input id="end_date" type="date" name="end_date" value="{{ end_date }}" />
+      </div>
+      <div class="field">
+        <label for="source">Source City or Airport</label>
+        <input id="source" type="text" name="source" value="{{ request.args.get('source', '') }}" />
+      </div>
+      <div class="field">
+        <label for="destination">Destination City or Airport</label>
+        <input id="destination" type="text" name="destination" value="{{ request.args.get('destination', '') }}" />
+      </div>
+    </div>
+    <div class="inline-actions">
+      <button type="submit">Filter</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  {% if flights %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Route</th>
+        <th>Departure</th>
+        <th>Arrival</th>
+        <th>Price</th>
+        <th>Tickets</th>
+        <th>Status</th>
+        <th>Manage</th>
+      </tr>
+      {% for flight in flights %}
+      <tr>
+        <td>{{ flight['flight_id'] }}</td>
+        <td>{{ flight['source_airport'] }} to {{ flight['destination_airport'] }}</td>
+        <td>{{ flight['departure_time'] }}</td>
+        <td>{{ flight['arrival_time'] }}</td>
+        <td>${{ '%.2f'|format(flight['price']) }}</td>
+        <td>{{ flight['tickets_sold'] }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('update_status', flight_id=flight['flight_id']) }}">
+            <select name="status">
+              {% for status in ['On Time', 'Delayed', 'Cancelled'] %}
+              <option value="{{ status }}" {% if flight['status'] == status %}selected{% endif %}>{{ status }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit">Update</button>
+          </form>
+        </td>
+        <td>
+          <a class="button-secondary" href="{{ url_for('staff_flight_detail', flight_id=flight['flight_id']) }}">
+            Details
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No upcoming flights scheduled.</strong>
+    <p>Create a new flight to populate the next-30-days operations view.</p>
+  </div>
+  {% endif %}
+</section>
 {% endblock %}

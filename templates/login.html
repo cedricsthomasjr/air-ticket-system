@@ -1,22 +1,73 @@
 {% extends 'base.html' %} {% block content %}
-<h1>Login</h1>
-<form method="POST">
-  <label>User Type:</label>
-  <select name="user_type">
-    <option value="customer">Customer</option>
-    <option value="staff">Airline Staff</option></select
-  ><br /><br />
+<section class="split-layout">
+  <div class="hero">
+    <p class="eyebrow">Secure Access</p>
+    <h1>Run bookings and airline operations from one intelligent workspace.</h1>
+    <p>
+      Sign in as a customer or airline operator to access role-specific tools,
+      real-time flight inventory, and ticket workflows.
+    </p>
 
-  <label>Email or Username:</label>
-  <input type="text" name="identifier" required /><br /><br />
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">2</div>
+        <strong>Role control</strong>
+        <p>Separate customer and staff experiences with focused tools.</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">30</div>
+        <strong>Day operations window</strong>
+        <p>Staff views surface flights departing in the next month.</p>
+      </div>
+    </div>
+  </div>
 
-  <label>Password:</label>
-  <input type="password" name="password" required /><br /><br />
+  <section class="panel">
+    <p class="eyebrow">Sign In</p>
+    <h2>Access your account</h2>
+    <p>Use one of the sample logins below or your own seeded account.</p>
 
-  <button type="submit">Login</button>
-</form>
+    <form method="POST">
+      <div class="field">
+        <label for="user_type">User Type</label>
+        <select id="user_type" name="user_type">
+          <option value="customer">Customer</option>
+          <option value="staff">Airline Staff</option>
+        </select>
+      </div>
 
-<p>Customer test login: cj@example.com / test123</p>
-<p>Staff test login: staff1 / admin123</p>
-<p><a href="{{ url_for('reset_db') }}">Reset sample database</a></p>
+      <div class="field">
+        <label for="identifier">Email or Username</label>
+        <input id="identifier" type="text" name="identifier" required />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" required />
+      </div>
+
+      <div class="inline-actions">
+        <button type="submit">Log In</button>
+        <a class="button-secondary" href="{{ url_for('register') }}">Register</a>
+        <a class="button-secondary" href="{{ url_for('public_search') }}">
+          Public Search
+        </a>
+        <a class="button-secondary" href="{{ url_for('reset_db') }}">
+          Reset Sample Database
+        </a>
+      </div>
+    </form>
+
+    <div class="cred-list">
+      <div class="cred-card">
+        <strong>Customer Demo</strong>
+        <p><code>cj@example.com / test123</code></p>
+      </div>
+      <div class="cred-card">
+        <strong>Staff Demo</strong>
+        <p><code>staff1 / admin123</code></p>
+      </div>
+    </div>
+  </section>
+</section>
 {% endblock %}

@@ -1,9 +1,41 @@
 {% extends 'base.html' %} {% block content %}
-<h1>Airline Staff Home</h1>
-<p>Welcome, {{ name }} ({{ airline }})</p>
-<nav>
-  <a href="{{ url_for('staff_flights') }}">View Flights</a>
-  <a href="{{ url_for('create_flight') }}">Create New Flight</a>
-  <a href="{{ url_for('logout') }}">Logout</a>
-</nav>
+<section class="hero">
+  <p class="eyebrow">Airline Command Center</p>
+  <h1>{{ name }}</h1>
+  <p>
+    Managing <strong>{{ airline }}</strong>. Review upcoming operations, adjust
+    status, inspect customers, and build new schedules.
+  </p>
+
+  <div class="pill-nav">
+    <a class="button" href="{{ url_for('staff_flights') }}">View Flights</a>
+    <a class="button-secondary" href="{{ url_for('create_flight') }}">
+      Create New Flight
+    </a>
+    <a class="button-secondary" href="{{ url_for('add_airplane') }}">
+      Add Airplane
+    </a>
+    <a class="button-secondary" href="{{ url_for('reports') }}">Reports</a>
+    <a class="button-secondary" href="{{ url_for('logout') }}">Logout</a>
+  </div>
+</section>
+
+<section class="action-grid">
+  <a class="action-card" href="{{ url_for('staff_flights') }}">
+    <strong>Live Operations</strong>
+    <p>See all flights leaving in the next month, sorted by departure time.</p>
+  </a>
+  <a class="action-card" href="{{ url_for('create_flight') }}">
+    <strong>Launch a New Route</strong>
+    <p>Add flights with pricing, aircraft assignment, and schedule details.</p>
+  </a>
+  <a class="action-card" href="{{ url_for('add_airplane') }}">
+    <strong>Add Airplanes</strong>
+    <p>Register aircraft owned by {{ airline }} and review the fleet.</p>
+  </a>
+  <a class="action-card" href="{{ url_for('reports') }}">
+    <strong>View Reports</strong>
+    <p>See ticket totals and month-wise sales for your airline.</p>
+  </a>
+</section>
 {% endblock %}

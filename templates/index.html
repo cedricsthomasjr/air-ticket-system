@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% block content %}
+<section class="hero">
+  <p class="eyebrow">AeroIQ Network</p>
+  <h1>AI-powered flight booking and airline operations</h1>
+  <p>
+    Search live route inventory, create a customer or airline staff account, or
+    sign in to manage bookings and operational workflows.
+  </p>
+
+  <div class="pill-nav">
+    <a class="button" href="{{ url_for('public_search') }}">View Public Flight Info</a>
+    <a class="button-secondary" href="{{ url_for('register') }}">Register</a>
+    <a class="button-secondary" href="{{ url_for('login') }}">Login</a>
+  </div>
+</section>
+
+<section class="action-grid">
+  <a class="action-card" href="{{ url_for('public_search') }}">
+    <strong>Search Future Flights</strong>
+    <p>Filter by airport, city, departure date, and return window.</p>
+  </a>
+  <a class="action-card" href="{{ url_for('register') }}">
+    <strong>Create an Account</strong>
+    <p>Register as a customer or airline staff member.</p>
+  </a>
+  <a class="action-card" href="{{ url_for('login') }}">
+    <strong>Role-Based Login</strong>
+    <p>Customer and staff users get purpose-built dashboards.</p>
+  </a>
+</section>
+{% endblock %}

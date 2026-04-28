@@ -1,28 +1,69 @@
 {% extends 'base.html' %} {% block content %}
-<h1>My Flights</h1>
-<table>
-  <tr>
-    <th>ID</th>
-    <th>Airline</th>
-    <th>Source</th>
-    <th>Destination</th>
-    <th>Departure</th>
-    <th>Arrival</th>
-    <th>Status</th>
-  </tr>
-  {% for flight in flights %}
-  <tr>
-    <td>{{ flight['flight_id'] }}</td>
-    <td>{{ flight['airline_name'] }}</td>
-    <td>{{ flight['source_airport'] }}</td>
-    <td>{{ flight['destination_airport'] }}</td>
-    <td>{{ flight['departure_time'] }}</td>
-    <td>{{ flight['arrival_time'] }}</td>
-    <td>{{ flight['status'] }}</td>
-  </tr>
-  {% endfor %}
-</table>
+<section class="hero">
+  <p class="eyebrow">My Flights</p>
+  <h1>Your booked itinerary</h1>
+  <p>Review the flights currently tied to your customer account.</p>
 
-<br />
-<a href="{{ url_for('customer_home') }}">Back</a>
+  <div class="pill-nav">
+    <a class="button-secondary" href="{{ url_for('customer_home') }}">Back</a>
+  </div>
+</section>
+
+<section class="panel">
+  {% if flights %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Airline</th>
+        <th>Route</th>
+        <th>Departure</th>
+        <th>Arrival</th>
+        <th>Status</th>
+        <th>Rating</th>
+      </tr>
+      {% for flight in flights %}
+      <tr>
+        <td>{{ flight['flight_id'] }}</td>
+        <td>{{ flight['airline_name'] }}</td>
+        <td>{{ flight['source_airport'] }} to {{ flight['destination_airport'] }}</td>
+        <td>{{ flight['departure_time'] }}</td>
+        <td>{{ flight['arrival_time'] }}</td>
+        <td>
+          <span
+            class="status-chip {% if flight['status']|lower == 'delayed' %}delayed{% elif flight['status']|lower == 'cancelled' %}cancelled{% endif %}"
+          >
+            {{ flight['status'] }}
+          </span>
+        </td>
+        <td>
+          {% if flight['departure_time'] < now %}
+          <form method="POST" action="{{ url_for('review_flight', flight_id=flight['flight_id']) }}">
+            <div class="field">
+              <select name="rating" required>
+                {% for rating in range(1, 6) %}
+                <option value="{{ rating }}" {% if flight['rating'] == rating %}selected{% endif %}>{{ rating }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="field">
+              <textarea name="comment" placeholder="Comment">{{ flight['comment'] or '' }}</textarea>
+            </div>
+            <button type="submit">Save</button>
+          </form>
+          {% else %}
+          <span class="muted">Available after travel</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No flights booked yet.</strong>
+    <p>Use the search page to explore future routes in the sample system.</p>
+  </div>
+  {% endif %}
+</section>
 {% endblock %}

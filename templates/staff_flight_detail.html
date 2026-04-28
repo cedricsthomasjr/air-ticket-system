@@ -1,0 +1,69 @@
+{% extends 'base.html' %} {% block content %}
+<section class="hero">
+  <p class="eyebrow">Flight Details</p>
+  <h1>Flight {{ flight['flight_id'] }}</h1>
+  <p>
+    {{ flight['source_airport'] }} to {{ flight['destination_airport'] }} on
+    {{ flight['departure_time'] }}.
+  </p>
+  <div class="pill-nav">
+    <a class="button-secondary" href="{{ url_for('staff_flights') }}">Back</a>
+  </div>
+</section>
+
+<section class="panel">
+  <p class="eyebrow">Customers</p>
+  <h2>{{ customers|length }} purchased ticket{{ '' if customers|length == 1 else 's' }}</h2>
+  {% if customers %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Purchased</th>
+      </tr>
+      {% for customer in customers %}
+      <tr>
+        <td>{{ customer['name'] }}</td>
+        <td>{{ customer['email'] }}</td>
+        <td>{{ customer['purchase_time'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No customers have purchased this flight yet.</strong>
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <p class="eyebrow">Ratings</p>
+  <h2>Average rating: {{ '%.2f'|format(avg_rating) if avg_rating else 'No ratings yet' }}</h2>
+  {% if reviews %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Customer</th>
+        <th>Rating</th>
+        <th>Comment</th>
+        <th>Date</th>
+      </tr>
+      {% for review in reviews %}
+      <tr>
+        <td>{{ review['name'] }} ({{ review['email'] }})</td>
+        <td>{{ review['rating'] }}</td>
+        <td>{{ review['comment'] }}</td>
+        <td>{{ review['created_at'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No ratings or comments yet.</strong>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

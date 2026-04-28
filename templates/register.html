@@ -1,0 +1,57 @@
+{% extends 'base.html' %} {% block content %}
+<section class="hero">
+  <p class="eyebrow">Register</p>
+  <h1>Create a customer or airline staff account</h1>
+  <p>Passwords are stored as MD5 hashes to match the course requirement.</p>
+</section>
+
+<section class="panel">
+  <form method="POST">
+    <div class="form-grid">
+      <div class="field">
+        <label for="user_type">User Type</label>
+        <select id="user_type" name="user_type">
+          <option value="customer">Customer</option>
+          <option value="staff">Airline Staff</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" required />
+      </div>
+      <div class="field">
+        <label for="email">Customer Email</label>
+        <input id="email" type="email" name="email" />
+      </div>
+      <div class="field">
+        <label for="name">Customer Name</label>
+        <input id="name" type="text" name="name" />
+      </div>
+      <div class="field">
+        <label for="username">Staff Username</label>
+        <input id="username" type="text" name="username" />
+      </div>
+      <div class="field">
+        <label for="first_name">Staff First Name</label>
+        <input id="first_name" type="text" name="first_name" />
+      </div>
+      <div class="field">
+        <label for="last_name">Staff Last Name</label>
+        <input id="last_name" type="text" name="last_name" />
+      </div>
+      <div class="field">
+        <label for="airline_name">Staff Airline</label>
+        <select id="airline_name" name="airline_name">
+          {% for airline in airlines %}
+          <option value="{{ airline['airline_name'] }}">{{ airline['airline_name'] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="inline-actions">
+      <button type="submit">Register</button>
+      <a class="button-secondary" href="{{ url_for('login') }}">Login</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

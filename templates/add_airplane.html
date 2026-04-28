@@ -1,0 +1,48 @@
+{% extends 'base.html' %} {% block content %}
+<section class="hero">
+  <p class="eyebrow">Airplanes</p>
+  <h1>Add an airplane for your airline</h1>
+  <p>The confirmation view lists all aircraft owned by the staff member's airline.</p>
+</section>
+
+<section class="panel">
+  <form method="POST">
+    <div class="form-grid">
+      <div class="field">
+        <label for="num_seats">Number of Seats</label>
+        <input id="num_seats" type="number" min="1" name="num_seats" required />
+      </div>
+      <div class="field">
+        <label for="manufacturer">Manufacturer</label>
+        <input id="manufacturer" type="text" name="manufacturer" placeholder="Boeing" />
+      </div>
+    </div>
+    <div class="inline-actions">
+      <button type="submit">Add Airplane</button>
+      <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <p class="eyebrow">Owned Aircraft</p>
+  {% if airplanes %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Seats</th>
+        <th>Manufacturer</th>
+      </tr>
+      {% for airplane in airplanes %}
+      <tr>
+        <td>{{ airplane['airplane_id'] }}</td>
+        <td>{{ airplane['num_seats'] }}</td>
+        <td>{{ airplane['manufacturer'] or 'N/A' }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

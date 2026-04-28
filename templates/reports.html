@@ -1,0 +1,65 @@
+{% extends 'base.html' %} {% block content %}
+<section class="hero">
+  <p class="eyebrow">Reports</p>
+  <h1>Ticket sales by date range</h1>
+  <p>Review total tickets sold and month-wise ticket sales for your airline.</p>
+</section>
+
+<section class="panel">
+  <form method="GET">
+    <div class="form-grid">
+      <div class="field">
+        <label for="start_date">Start Date</label>
+        <input id="start_date" type="date" name="start_date" value="{{ start_date }}" />
+      </div>
+      <div class="field">
+        <label for="end_date">End Date</label>
+        <input id="end_date" type="date" name="end_date" value="{{ end_date }}" />
+      </div>
+    </div>
+    <div class="inline-actions">
+      <button type="submit">Update Report</button>
+      <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
+    </div>
+  </form>
+</section>
+
+<section class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ totals['total_tickets'] }}</div>
+    <strong>Total tickets sold</strong>
+    <p>{{ start_date }} through {{ end_date }}</p>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">${{ '%.2f'|format(totals['total_sales']) }}</div>
+    <strong>Total sales</strong>
+    <p>Calculated from ticketed flight prices.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <p class="eyebrow">Month Wise</p>
+  {% if monthly %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Month</th>
+        <th>Tickets Sold</th>
+        <th>Sales</th>
+      </tr>
+      {% for row in monthly %}
+      <tr>
+        <td>{{ row['month'] }}</td>
+        <td>{{ row['tickets_sold'] }}</td>
+        <td>${{ '%.2f'|format(row['sales']) }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No tickets were sold in this date range.</strong>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
