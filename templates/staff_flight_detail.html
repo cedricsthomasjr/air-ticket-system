@@ -3,11 +3,35 @@
   <p class="eyebrow">Flight Details</p>
   <h1>Flight {{ flight['flight_number'] }}</h1>
   <p>
-    {{ flight['source_airport'] }} to {{ flight['destination_airport'] }} on
-    {{ flight['departure_time'] }}.
+    {{ flight['source_city'] }} ({{ flight['source_airport'] }}) to
+    {{ flight['destination_city'] }} ({{ flight['destination_airport'] }}) on {{ flight['departure_time'] }}.
   </p>
   <div class="pill-nav">
     <a class="button-secondary" href="{{ url_for('staff_flights') }}">Back</a>
+    <a class="button-secondary" href="{{ url_for('reports') }}">Reports</a>
+  </div>
+</section>
+
+<section class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ flight['tickets_sold'] }}</div>
+    <strong>Tickets sold</strong>
+    <p>{{ flight['seats_available'] }} seats still available.</p>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">${{ '%.2f'|format(flight['price']) }}</div>
+    <strong>Base fare</strong>
+    <p>Aircraft #{{ flight['airplane_id'] }} with {{ flight['num_seats'] }} seats.</p>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ flight['status_label'] }}</div>
+    <strong>Status</strong>
+    <p>Current operating state.</p>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ '%.2f'|format(avg_rating) if avg_rating else 'N/A' }}</div>
+    <strong>Average rating</strong>
+    <p>Submitted customer feedback.</p>
   </div>
 </section>
 
@@ -20,12 +44,14 @@
       <tr>
         <th>Name</th>
         <th>Email</th>
+        <th>Phone</th>
         <th>Purchased</th>
       </tr>
       {% for customer in customers %}
       <tr>
         <td>{{ customer['name'] }}</td>
         <td>{{ customer['email'] }}</td>
+        <td>{{ customer['phone_number'] }}</td>
         <td>{{ customer['purchase_datetime'] }}</td>
       </tr>
       {% endfor %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %} {% block content %}
+<section class="hero">
+  <p class="eyebrow">Customers</p>
+  <h1>Ticket purchasers for your airline</h1>
+  <p>Filter by purchase date to find frequent customers and recent demand.</p>
+
+  <div class="pill-nav">
+    <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
+    <a class="button-secondary" href="{{ url_for('reports') }}">Reports</a>
+  </div>
+</section>
+
+<section class="panel">
+  <form method="GET">
+    <div class="form-grid">
+      <div class="field">
+        <label for="start_date">Start Date</label>
+        <input id="start_date" type="date" name="start_date" value="{{ start_date }}" />
+      </div>
+      <div class="field">
+        <label for="end_date">End Date</label>
+        <input id="end_date" type="date" name="end_date" value="{{ end_date }}" />
+      </div>
+    </div>
+    <div class="inline-actions">
+      <button type="submit">Filter</button>
+      <a class="button-secondary" href="{{ url_for('staff_customers') }}">Reset</a>
+    </div>
+  </form>
+</section>
+
+{% if frequent_customer %}
+<section class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ frequent_customer['tickets_purchased'] }}</div>
+    <strong>Most frequent customer</strong>
+    <p>{{ frequent_customer['name'] }} / {{ frequent_customer['email'] }}</p>
+  </div>
+</section>
+{% endif %}
+
+<section class="panel">
+  <p class="eyebrow">Purchasers</p>
+  {% if customers %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Tickets</th>
+        <th>Last Purchase</th>
+      </tr>
+      {% for customer in customers %}
+      <tr>
+        <td>{{ customer['name'] }}</td>
+        <td>{{ customer['email'] }}</td>
+        <td>{{ customer['phone_number'] }}</td>
+        <td>{{ customer['tickets_purchased'] }}</td>
+        <td>{{ customer['last_purchase'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No customers found for this filter.</strong>
+    <p>Purchasers appear here after tickets are sold for your airline.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

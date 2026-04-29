@@ -3,6 +3,10 @@
   <p class="eyebrow">Reports</p>
   <h1>Ticket sales by date range</h1>
   <p>Review total tickets sold and month-wise ticket sales for your airline.</p>
+  <div class="pill-nav">
+    <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
+    <a class="button-secondary" href="{{ url_for('staff_customers') }}">Customers</a>
+  </div>
 </section>
 
 <section class="panel">
@@ -19,7 +23,7 @@
     </div>
     <div class="inline-actions">
       <button type="submit">Update Report</button>
-      <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
+      <a class="button-secondary" href="{{ url_for('reports') }}">Reset</a>
     </div>
   </form>
 </section>
@@ -35,6 +39,82 @@
     <strong>Total sales</strong>
     <p>Calculated from ticketed flight prices.</p>
   </div>
+</section>
+
+<section class="panel">
+  <p class="eyebrow">Operational Status</p>
+  {% if status_counts %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Status</th>
+        <th>Flights</th>
+      </tr>
+      {% for row in status_counts %}
+      <tr>
+        <td>{{ row['status'] }}</td>
+        <td>{{ row['flight_count'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No flights exist for your airline yet.</strong>
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <p class="eyebrow">Top Routes</p>
+  {% if top_routes %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Route</th>
+        <th>Tickets Sold</th>
+        <th>Sales</th>
+      </tr>
+      {% for row in top_routes %}
+      <tr>
+        <td>{{ row['route'] }}</td>
+        <td>{{ row['tickets_sold'] }}</td>
+        <td>${{ '%.2f'|format(row['sales']) }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No route sales in this date range.</strong>
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <p class="eyebrow">Top Customers</p>
+  {% if top_customers %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Customer</th>
+        <th>Email</th>
+        <th>Tickets Sold</th>
+      </tr>
+      {% for row in top_customers %}
+      <tr>
+        <td>{{ row['name'] }}</td>
+        <td>{{ row['email'] }}</td>
+        <td>{{ row['tickets_sold'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No customer purchases in this date range.</strong>
+  </div>
+  {% endif %}
 </section>
 
 <section class="panel">

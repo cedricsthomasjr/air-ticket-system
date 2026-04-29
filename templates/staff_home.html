@@ -15,8 +15,37 @@
     <a class="button-secondary" href="{{ url_for('add_airplane') }}">
       Add Airplane
     </a>
+    <a class="button-secondary" href="{{ url_for('add_airport') }}">
+      Add Airport
+    </a>
+    <a class="button-secondary" href="{{ url_for('staff_customers') }}">
+      Customers
+    </a>
     <a class="button-secondary" href="{{ url_for('reports') }}">Reports</a>
     <a class="button-secondary" href="{{ url_for('logout') }}">Logout</a>
+  </div>
+</section>
+
+<section class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ upcoming_flights }}</div>
+    <strong>Upcoming flights</strong>
+    <p>Flights scheduled after the current time.</p>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ fleet['fleet_count'] }}</div>
+    <strong>Aircraft</strong>
+    <p>{{ fleet['total_seats'] }} total seats in the fleet.</p>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ recent_sales['recent_tickets'] }}</div>
+    <strong>30-day tickets</strong>
+    <p>${{ '%.2f'|format(recent_sales['recent_sales']) }} in recent sales.</p>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ '%.1f'|format(avg_rating) if avg_rating else 'N/A' }}</div>
+    <strong>Average rating</strong>
+    <p>Across all rated {{ airline }} flights.</p>
   </div>
 </section>
 
@@ -32,6 +61,14 @@
   <a class="action-card" href="{{ url_for('add_airplane') }}">
     <strong>Add Airplanes</strong>
     <p>Register aircraft owned by {{ airline }} and review the fleet.</p>
+  </a>
+  <a class="action-card" href="{{ url_for('add_airport') }}">
+    <strong>Maintain Airports</strong>
+    <p>Add airport codes that can be used in new flight schedules.</p>
+  </a>
+  <a class="action-card" href="{{ url_for('staff_customers') }}">
+    <strong>Customer Analytics</strong>
+    <p>Find frequent customers and recent ticket purchasers for your airline.</p>
   </a>
   <a class="action-card" href="{{ url_for('reports') }}">
     <strong>View Reports</strong>

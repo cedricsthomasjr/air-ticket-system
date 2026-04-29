@@ -1,11 +1,18 @@
 {% extends 'base.html' %} {% block content %}
 <section class="hero">
   <p class="eyebrow">Create Flight</p>
-  <h1>Add a new route to the schedule</h1>
-  <p>Enter route details, timing, pricing, and aircraft assignment.</p>
+  <h1>Add a scheduled flight</h1>
+  <p>Choose existing airports, assign an aircraft owned by your airline, and set the initial operating status.</p>
+
+  <div class="pill-nav">
+    <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
+    <a class="button-secondary" href="{{ url_for('add_airport') }}">Add Airport</a>
+    <a class="button-secondary" href="{{ url_for('add_airplane') }}">Add Airplane</a>
+  </div>
 </section>
 
 <section class="panel">
+  {% if airplanes and airports|length >= 2 %}
   <form method="POST">
     <div class="form-grid">
       <div class="field">
@@ -14,20 +21,25 @@
       </div>
 
       <div class="field">
-        <label for="departure_airport_code">Departure Airport Code</label>
-        <input id="departure_airport_code" type="text" name="departure_airport_code" maxlength="3" placeholder="JFK" required />
+        <label for="departure_airport_code">Departure Airport</label>
+        <select id="departure_airport_code" name="departure_airport_code" required>
+          {% for airport in airports %}
+          <option value="{{ airport['airport_code'] }}">
+            {{ airport['airport_code'] }} - {{ airport['city'] }}, {{ airport['country'] }}
+          </option>
+          {% endfor %}
+        </select>
       </div>
 
       <div class="field">
-        <label for="arrival_airport_code">Arrival Airport Code</label>
-        <input
-          id="arrival_airport_code"
-          type="text"
-          name="arrival_airport_code"
-          maxlength="3"
-          placeholder="PVG"
-          required
-        />
+        <label for="arrival_airport_code">Arrival Airport</label>
+        <select id="arrival_airport_code" name="arrival_airport_code" required>
+          {% for airport in airports %}
+          <option value="{{ airport['airport_code'] }}">
+            {{ airport['airport_code'] }} - {{ airport['city'] }}, {{ airport['country'] }}
+          </option>
+          {% endfor %}
+        </select>
       </div>
 
       <div class="field">
@@ -41,15 +53,26 @@
       </div>
 
       <div class="field">
-        <label for="price">Price</label>
-        <input id="price" type="number" step="0.01" name="price" placeholder="199.00" required />
+        <label for="price">Base Price</label>
+        <input id="price" type="number" min="0" step="0.01" name="price" placeholder="199.00" required />
+      </div>
+
+      <div class="field">
+        <label for="status">Initial Status</label>
+        <select id="status" name="status" required>
+          <option value="on-time">on-time</option>
+          <option value="delayed">delayed</option>
+          <option value="cancelled">cancelled</option>
+        </select>
       </div>
 
       <div class="field">
         <label for="airplane_id">Airplane</label>
         <select id="airplane_id" name="airplane_id" required>
           {% for plane in airplanes %}
-          <option value="{{ plane['airplane_id'] }}">{{ plane['airplane_id'] }} - {{ plane['manufacturer'] }}</option>
+          <option value="{{ plane['airplane_id'] }}">
+            #{{ plane['airplane_id'] }} - {{ plane['manufacturer'] }} ({{ plane['num_seats'] }} seats)
+          </option>
           {% endfor %}
         </select>
       </div>
@@ -57,8 +80,18 @@
 
     <div class="inline-actions">
       <button type="submit">Create Flight</button>
-      <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
+      <a class="button-secondary" href="{{ url_for('staff_flights') }}">View Flights</a>
     </div>
   </form>
+  {% else %}
+  <div class="empty-state">
+    <strong>Flight creation needs at least one airplane and two airports.</strong>
+    <p>Add the missing setup data before creating a schedule.</p>
+    <div class="inline-actions" style="justify-content: center; margin-top: 16px">
+      <a class="button" href="{{ url_for('add_airplane') }}">Add Airplane</a>
+      <a class="button-secondary" href="{{ url_for('add_airport') }}">Add Airport</a>
+    </div>
+  </div>
+  {% endif %}
 </section>
 {% endblock %}

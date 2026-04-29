@@ -3,6 +3,10 @@
   <p class="eyebrow">Airplanes</p>
   <h1>Add an airplane for your airline</h1>
   <p>The confirmation view lists all aircraft owned by the staff member's airline.</p>
+  <div class="pill-nav">
+    <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
+    <a class="button-secondary" href="{{ url_for('create_flight') }}">Create Flight</a>
+  </div>
 </section>
 
 <section class="panel">
@@ -14,16 +18,15 @@
       </div>
       <div class="field">
         <label for="manufacturer">Manufacturer</label>
-        <input id="manufacturer" type="text" name="manufacturer" placeholder="Boeing" />
+        <input id="manufacturer" type="text" name="manufacturer" placeholder="Boeing" required />
       </div>
       <div class="field">
         <label for="manufacture_date">Manufacture Date</label>
-        <input id="manufacture_date" type="date" name="manufacture_date" />
+        <input id="manufacture_date" type="date" name="manufacture_date" required />
       </div>
     </div>
     <div class="inline-actions">
       <button type="submit">Add Airplane</button>
-      <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
     </div>
   </form>
 </section>
@@ -48,6 +51,11 @@
       </tr>
       {% endfor %}
     </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No aircraft registered yet.</strong>
+    <p>Add an airplane before creating flights.</p>
   </div>
   {% endif %}
 </section>

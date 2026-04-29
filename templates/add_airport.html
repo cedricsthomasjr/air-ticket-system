@@ -1,0 +1,70 @@
+{% extends 'base.html' %} {% block content %}
+<section class="hero">
+  <p class="eyebrow">Airports</p>
+  <h1>Add airport codes</h1>
+  <p>New flights can only use airport codes that exist in the Airport table.</p>
+
+  <div class="pill-nav">
+    <a class="button-secondary" href="{{ url_for('staff_home') }}">Back</a>
+    <a class="button-secondary" href="{{ url_for('create_flight') }}">Create Flight</a>
+  </div>
+</section>
+
+<section class="panel">
+  <form method="POST">
+    <div class="form-grid">
+      <div class="field">
+        <label for="airport_code">Airport Code</label>
+        <input id="airport_code" type="text" name="airport_code" maxlength="3" placeholder="LAX" required />
+      </div>
+      <div class="field">
+        <label for="city">City</label>
+        <input id="city" type="text" name="city" placeholder="Los Angeles" required />
+      </div>
+      <div class="field">
+        <label for="country">Country</label>
+        <input id="country" type="text" name="country" placeholder="USA" required />
+      </div>
+      <div class="field">
+        <label for="airport_type">Airport Type</label>
+        <select id="airport_type" name="airport_type" required>
+          <option value="domestic">domestic</option>
+          <option value="international">international</option>
+        </select>
+      </div>
+    </div>
+    <div class="inline-actions">
+      <button type="submit">Add Airport</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <p class="eyebrow">Available Airports</p>
+  {% if airports %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Code</th>
+        <th>City</th>
+        <th>Country</th>
+        <th>Type</th>
+      </tr>
+      {% for airport in airports %}
+      <tr>
+        <td>{{ airport['airport_code'] }}</td>
+        <td>{{ airport['city'] }}</td>
+        <td>{{ airport['country'] }}</td>
+        <td>{{ airport['airport_type'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <strong>No airports are available.</strong>
+    <p>Add an airport before creating a flight.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
