@@ -10,6 +10,12 @@
   </div>
 </section>
 
+{% if not request.args.get('start_date') and not request.args.get('end_date') %}
+<div style="margin-bottom:8px">
+  <span class="metric-pill">Showing future flights — use filters below to see past flights</span>
+</div>
+{% endif %}
+
 <section class="panel">
   <form method="GET">
     <div class="form-grid">

@@ -5,12 +5,12 @@ INSERT INTO Airport VALUES
 ('PVG', 'Shanghai', 'China', 'international');
 
 INSERT INTO Customer VALUES
-('cj@nyu.edu', MD5('pass123'), 'CJ Thomas', '123', 'Main St', 'New York', 'NY', '1112223333', 'P123456', '2030-01-01', 'USA', '2003-05-10'),
-('brooke@email.com', MD5('pass123'), 'Brooke Smith', '456', 'Park Ave', 'New York', 'NY', '2223334444', 'P654321', '2029-06-15', 'USA', '2002-08-20'),
-('john@email.com', MD5('pass123'), 'John Doe', '789', 'Broadway', 'New York', 'NY', '3334445555', 'P999888', '2031-09-30', 'USA', '1998-12-12');
+('cj@nyu.edu', '32250170a0dca92d53ec9624f336ca24', 'CJ Thomas', '123', 'Main St', 'New York', 'NY', '1112223333', 'P123456', '2030-01-01', 'USA', '2003-05-10'),
+('brooke@email.com', '32250170a0dca92d53ec9624f336ca24', 'Brooke Smith', '456', 'Park Ave', 'New York', 'NY', '2223334444', 'P654321', '2029-06-15', 'USA', '2002-08-20'),
+('john@email.com', '32250170a0dca92d53ec9624f336ca24', 'John Doe', '789', 'Broadway', 'New York', 'NY', '3334445555', 'P999888', '2031-09-30', 'USA', '1998-12-12');
 
 INSERT INTO Airline_Staff VALUES
-('admin1', MD5('adminpass'), 'Alice', 'Brown', '1985-04-10', 'alice@jetblue.com', 'JetBlue');
+('admin1', '25e4ee4e9229397b6b17776bfceaf8e7', 'Alice', 'Brown', '1985-04-10', 'alice@jetblue.com', 'JetBlue');
 
 INSERT INTO Staff_Phone VALUES
 ('admin1', '9998887777'),

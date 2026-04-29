@@ -1,16 +1,17 @@
 {% extends 'base.html' %} {% block content %}
 <section class="hero">
   <p class="eyebrow">Register</p>
-  <h1>Create a customer or airline staff account</h1>
-  <p>Passwords are stored as MD5 hashes to match the course requirement.</p>
+  <h1>Create an account</h1>
+  <p>Choose your account type below. Passwords are stored as MD5 hashes.</p>
 </section>
 
 <section class="panel">
-  <form method="POST">
-    <div class="form-grid">
+  <form method="POST" id="reg-form">
+
+    <div class="form-grid" style="margin-bottom:20px">
       <div class="field">
-        <label for="user_type">User Type</label>
-        <select id="user_type" name="user_type">
+        <label for="user_type">Account Type</label>
+        <select id="user_type" name="user_type" onchange="switchRole(this.value)">
           <option value="customer">Customer</option>
           <option value="staff">Airline Staff</option>
         </select>
@@ -19,83 +20,109 @@
         <label for="password">Password</label>
         <input id="password" type="password" name="password" required />
       </div>
-      <div class="field">
-        <label for="email">Customer Email</label>
-        <input id="email" type="email" name="email" />
-      </div>
-      <div class="field">
-        <label for="name">Customer Name</label>
-        <input id="name" type="text" name="name" />
-      </div>
-      <div class="field">
-        <label for="building_number">Building Number</label>
-        <input id="building_number" type="text" name="building_number" />
-      </div>
-      <div class="field">
-        <label for="street">Street</label>
-        <input id="street" type="text" name="street" />
-      </div>
-      <div class="field">
-        <label for="city">City</label>
-        <input id="city" type="text" name="city" />
-      </div>
-      <div class="field">
-        <label for="state">State</label>
-        <input id="state" type="text" name="state" />
-      </div>
-      <div class="field">
-        <label for="phone_number">Customer Phone</label>
-        <input id="phone_number" type="tel" name="phone_number" />
-      </div>
-      <div class="field">
-        <label for="passport_number">Passport Number</label>
-        <input id="passport_number" type="text" name="passport_number" />
-      </div>
-      <div class="field">
-        <label for="passport_expiration">Passport Expiration</label>
-        <input id="passport_expiration" type="date" name="passport_expiration" />
-      </div>
-      <div class="field">
-        <label for="passport_country">Passport Country</label>
-        <input id="passport_country" type="text" name="passport_country" />
-      </div>
-      <div class="field">
-        <label for="date_of_birth">Date of Birth</label>
-        <input id="date_of_birth" type="date" name="date_of_birth" />
-      </div>
-      <div class="field">
-        <label for="username">Staff Username</label>
-        <input id="username" type="text" name="username" />
-      </div>
-      <div class="field">
-        <label for="first_name">Staff First Name</label>
-        <input id="first_name" type="text" name="first_name" />
-      </div>
-      <div class="field">
-        <label for="last_name">Staff Last Name</label>
-        <input id="last_name" type="text" name="last_name" />
-      </div>
-      <div class="field">
-        <label for="staff_email">Staff Email</label>
-        <input id="staff_email" type="email" name="staff_email" />
-      </div>
-      <div class="field">
-        <label for="staff_phone_number">Staff Phone</label>
-        <input id="staff_phone_number" type="tel" name="staff_phone_number" />
-      </div>
-      <div class="field">
-        <label for="airline_name">Staff Airline</label>
-        <select id="airline_name" name="airline_name">
-          {% for airline in airlines %}
-          <option value="{{ airline['airline_name'] }}">{{ airline['airline_name'] }}</option>
-          {% endfor %}
-        </select>
+    </div>
+
+    <!-- Customer fields -->
+    <div id="customer-fields">
+      <p class="eyebrow" style="margin-bottom:12px">Customer Details</p>
+      <div class="form-grid">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" name="email" />
+        </div>
+        <div class="field">
+          <label for="name">Full Name</label>
+          <input id="name" type="text" name="name" />
+        </div>
+        <div class="field">
+          <label for="building_number">Building Number</label>
+          <input id="building_number" type="text" name="building_number" />
+        </div>
+        <div class="field">
+          <label for="street">Street</label>
+          <input id="street" type="text" name="street" />
+        </div>
+        <div class="field">
+          <label for="city">City</label>
+          <input id="city" type="text" name="city" />
+        </div>
+        <div class="field">
+          <label for="state">State</label>
+          <input id="state" type="text" name="state" />
+        </div>
+        <div class="field">
+          <label for="phone_number">Phone</label>
+          <input id="phone_number" type="tel" name="phone_number" />
+        </div>
+        <div class="field">
+          <label for="date_of_birth">Date of Birth</label>
+          <input id="date_of_birth" type="date" name="date_of_birth" />
+        </div>
+        <div class="field">
+          <label for="passport_number">Passport Number</label>
+          <input id="passport_number" type="text" name="passport_number" />
+        </div>
+        <div class="field">
+          <label for="passport_expiration">Passport Expiration</label>
+          <input id="passport_expiration" type="date" name="passport_expiration" />
+        </div>
+        <div class="field">
+          <label for="passport_country">Passport Country</label>
+          <input id="passport_country" type="text" name="passport_country" />
+        </div>
       </div>
     </div>
-    <div class="inline-actions">
+
+    <!-- Staff fields -->
+    <div id="staff-fields" style="display:none">
+      <p class="eyebrow" style="margin-bottom:12px">Staff Details</p>
+      <div class="form-grid">
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" type="text" name="username" />
+        </div>
+        <div class="field">
+          <label for="first_name">First Name</label>
+          <input id="first_name" type="text" name="first_name" />
+        </div>
+        <div class="field">
+          <label for="last_name">Last Name</label>
+          <input id="last_name" type="text" name="last_name" />
+        </div>
+        <div class="field">
+          <label for="staff_email">Email</label>
+          <input id="staff_email" type="email" name="staff_email" />
+        </div>
+        <div class="field">
+          <label for="staff_phone_number">Phone</label>
+          <input id="staff_phone_number" type="tel" name="staff_phone_number" />
+        </div>
+        <div class="field">
+          <label for="date_of_birth_staff">Date of Birth</label>
+          <input id="date_of_birth_staff" type="date" name="date_of_birth" />
+        </div>
+        <div class="field">
+          <label for="airline_name">Airline</label>
+          <select id="airline_name" name="airline_name">
+            {% for airline in airlines %}
+            <option value="{{ airline['airline_name'] }}">{{ airline['airline_name'] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="inline-actions" style="margin-top:8px">
       <button type="submit">Register</button>
-      <a class="button-secondary" href="{{ url_for('login') }}">Login</a>
+      <a class="button-secondary" href="{{ url_for('login') }}">Already have an account</a>
     </div>
   </form>
 </section>
+
+<script>
+  function switchRole(val) {
+    document.getElementById('customer-fields').style.display = val === 'customer' ? '' : 'none';
+    document.getElementById('staff-fields').style.display   = val === 'staff'    ? '' : 'none';
+  }
+</script>
 {% endblock %}

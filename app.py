@@ -544,6 +544,9 @@ def my_flights():
         )
     """
     params = [session["user_id"]]
+    # Spec: default view is future flights only; date filters override this
+    if not start_date and not end_date:
+        where += " AND f.departure_datetime > NOW()"
     if start_date:
         where += " AND DATE(f.departure_datetime) >= %s"
         params.append(start_date)
