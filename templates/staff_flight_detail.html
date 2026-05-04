@@ -4,7 +4,7 @@
   <h1>Flight {{ flight['flight_number'] }}</h1>
   <p>
     {{ flight['source_city'] }} ({{ flight['source_airport'] }}) to
-    {{ flight['destination_city'] }} ({{ flight['destination_airport'] }}) on {{ flight['departure_time'] }}.
+    {{ flight['destination_city'] }} ({{ flight['destination_airport'] }}) · {{ flight['departure_time']|dt }}
   </p>
   <div class="pill-nav">
     <a class="button-secondary" href="{{ url_for('staff_flights') }}">Back</a>
@@ -52,7 +52,7 @@
         <td>{{ customer['name'] }}</td>
         <td>{{ customer['email'] }}</td>
         <td>{{ customer['phone_number'] }}</td>
-        <td>{{ customer['purchase_datetime'] }}</td>
+        <td>{{ customer['purchase_datetime']|dt }}</td>
       </tr>
       {% endfor %}
     </table>
@@ -65,28 +65,34 @@
 </section>
 
 <section class="panel">
-  <p class="eyebrow">Ratings</p>
-  <h2>Average rating: {{ '%.2f'|format(avg_rating) if avg_rating else 'No ratings yet' }}</h2>
+  <p class="eyebrow">Customer Ratings</p>
   {% if reviews %}
-  <div class="table-wrap">
-    <table>
-      <tr>
-        <th>Customer</th>
-        <th>Rating</th>
-        <th>Comment</th>
-      </tr>
-      {% for review in reviews %}
-      <tr>
-        <td>{{ review['name'] }} ({{ review['email'] }})</td>
-        <td>{{ review['rating'] }}</td>
-        <td>{{ review['comment'] }}</td>
-      </tr>
-      {% endfor %}
-    </table>
+  <p style="margin-bottom:16px">
+    Average score:
+    <strong style="color:var(--yellow);font-size:1.1rem">{{ '%.1f'|format(avg_rating) }}★</strong>
+    across {{ reviews|length }} review{{ '' if reviews|length == 1 else 's' }}
+  </p>
+  <div style="display:grid;gap:12px">
+    {% for review in reviews %}
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+        <strong>{{ review['name'] }}</strong>
+        <span style="color:var(--yellow);letter-spacing:2px;font-size:1rem">
+          {% for i in range(review['rating']) %}★{% endfor %}<span style="opacity:0.25">{% for i in range(5 - review['rating']) %}★{% endfor %}</span>
+        </span>
+      </div>
+      {% if review['comment'] %}
+      <p style="font-size:0.875rem;margin:0">{{ review['comment'] }}</p>
+      {% else %}
+      <p style="font-size:0.875rem;margin:0;opacity:0.4;font-style:italic">No comment.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
   </div>
   {% else %}
   <div class="empty-state">
-    <strong>No ratings or comments yet.</strong>
+    <strong>No ratings yet.</strong>
+    <p>Customer reviews appear here after passengers rate this flight.</p>
   </div>
   {% endif %}
 </section>

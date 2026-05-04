@@ -28,6 +28,7 @@ MYSQL_USER=root
 MYSQL_PASSWORD=
 MYSQL_DATABASE=air_ticket_system
 SECRET_KEY=dev_secret
+FLASK_RUN_PORT=5001
 ```
 
 ## How to Run
@@ -40,21 +41,24 @@ python app.py
 Open:
 
 ```
-http://127.0.0.1:5000
+http://127.0.0.1:5001
 ```
+
+Port `5001` avoids the macOS AirPlay/Control Center service that can answer on
+`localhost:5000` with HTTP 403.
 
 ## Demo Credentials
 
 Customer:
 
 ```
-cj@nyu.edu / pass123
+testcustomer@nyu.edu / 1234
 ```
 
 Airline staff:
 
 ```
-admin1 / adminpass
+admin / abcd
 ```
 
 ## Main Features

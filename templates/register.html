@@ -2,118 +2,177 @@
 <section class="hero">
   <p class="eyebrow">Register</p>
   <h1>Create an account</h1>
-  <p>Choose your account type below. Passwords are stored as MD5 hashes.</p>
+  <p>All fields marked with * are required.</p>
 </section>
 
 <section class="panel">
-  <form method="POST" id="reg-form">
+  <form method="POST" id="reg-form" novalidate>
 
     <div class="form-grid" style="margin-bottom:20px">
       <div class="field">
-        <label for="user_type">Account Type</label>
+        <label for="user_type">Account Type *</label>
         <select id="user_type" name="user_type" onchange="switchRole(this.value)">
-          <option value="customer">Customer</option>
-          <option value="staff">Airline Staff</option>
+          <option value="customer" {% if form_data and form_data.get('user_type','customer')=='customer' %}selected{% endif %}>Customer</option>
+          <option value="staff"    {% if form_data and form_data.get('user_type')=='staff' %}selected{% endif %}>Airline Staff</option>
         </select>
       </div>
       <div class="field">
-        <label for="password">Password</label>
-        <input id="password" type="password" name="password" required />
+        <label for="password">Password *</label>
+        <input id="password" type="password" name="password" required minlength="4"
+               placeholder="At least 4 characters" autocomplete="new-password" />
+      </div>
+      <div class="field">
+        <label for="confirm_password">Confirm Password *</label>
+        <input id="confirm_password" type="password" name="confirm_password" required minlength="4"
+               placeholder="Re-enter your password" autocomplete="new-password" />
       </div>
     </div>
 
-    <!-- Customer fields -->
+    <!-- ── Customer fields ──────────────────────────────────────── -->
     <div id="customer-fields">
-      <p class="eyebrow" style="margin-bottom:12px">Customer Details</p>
+      <p class="eyebrow" style="margin-bottom:12px">Personal Info</p>
       <div class="form-grid">
         <div class="field">
-          <label for="email">Email</label>
-          <input id="email" type="email" name="email" />
+          <label for="email">Email *</label>
+          <input id="email" type="email" name="email" data-required="true"
+                 placeholder="you@example.com" autocomplete="email"
+                 value="{{ form_data.get('email','') if form_data }}" />
         </div>
         <div class="field">
-          <label for="name">Full Name</label>
-          <input id="name" type="text" name="name" />
+          <label for="name">Full Name *</label>
+          <input id="name" type="text" name="name" data-required="true"
+                 placeholder="Jane Smith" autocomplete="name" maxlength="100"
+                 value="{{ form_data.get('name','') if form_data }}" />
         </div>
         <div class="field">
-          <label for="building_number">Building Number</label>
-          <input id="building_number" type="text" name="building_number" />
+          <label for="date_of_birth">Date of Birth *</label>
+          <input id="date_of_birth" type="date" name="date_of_birth" data-required="true"
+                 autocomplete="bday"
+                 value="{{ form_data.get('date_of_birth','') if form_data }}" />
+        </div>
+        <div class="field">
+          <label for="phone_number">Phone *</label>
+          <input id="phone_number" type="tel" name="phone_number" data-required="true"
+                 placeholder="5551234567" autocomplete="tel" maxlength="20"
+                 value="{{ form_data.get('phone_number','') if form_data }}" />
+          <small class="muted">Spaces and dashes are stripped automatically</small>
+        </div>
+      </div>
+
+      <p class="eyebrow" style="margin-bottom:12px;margin-top:20px">
+        Address
+        <span style="font-size:0.8rem;text-transform:none;letter-spacing:0;color:var(--text-muted)">(optional)</span>
+      </p>
+      <div class="form-grid">
+        <div class="field">
+          <label for="building_number">Building / Unit #</label>
+          <input id="building_number" type="text" name="building_number"
+                 placeholder="123" maxlength="10"
+                 value="{{ form_data.get('building_number','') if form_data }}" />
         </div>
         <div class="field">
           <label for="street">Street</label>
-          <input id="street" type="text" name="street" />
+          <input id="street" type="text" name="street"
+                 placeholder="Main St" autocomplete="street-address" maxlength="100"
+                 value="{{ form_data.get('street','') if form_data }}" />
         </div>
         <div class="field">
           <label for="city">City</label>
-          <input id="city" type="text" name="city" />
+          <input id="city" type="text" name="city"
+                 placeholder="New York" autocomplete="address-level2" maxlength="50"
+                 value="{{ form_data.get('city','') if form_data }}" />
         </div>
         <div class="field">
-          <label for="state">State</label>
-          <input id="state" type="text" name="state" />
+          <label for="state">State / Region</label>
+          <input id="state" type="text" name="state"
+                 placeholder="NY" autocomplete="address-level1" maxlength="50"
+                 value="{{ form_data.get('state','') if form_data }}" />
+        </div>
+      </div>
+
+      <p class="eyebrow" style="margin-bottom:12px;margin-top:20px">Passport</p>
+      <div class="form-grid">
+        <div class="field">
+          <label for="passport_number">Passport Number *</label>
+          <input id="passport_number" type="text" name="passport_number" data-required="true"
+                 placeholder="A12345678" maxlength="30"
+                 value="{{ form_data.get('passport_number','') if form_data }}" />
         </div>
         <div class="field">
-          <label for="phone_number">Phone</label>
-          <input id="phone_number" type="tel" name="phone_number" />
+          <label for="passport_country">Issuing Country *</label>
+          <input id="passport_country" type="text" name="passport_country" data-required="true"
+                 placeholder="United States" maxlength="50"
+                 value="{{ form_data.get('passport_country','') if form_data }}" />
         </div>
         <div class="field">
-          <label for="date_of_birth">Date of Birth</label>
-          <input id="date_of_birth" type="date" name="date_of_birth" />
-        </div>
-        <div class="field">
-          <label for="passport_number">Passport Number</label>
-          <input id="passport_number" type="text" name="passport_number" />
-        </div>
-        <div class="field">
-          <label for="passport_expiration">Passport Expiration</label>
-          <input id="passport_expiration" type="date" name="passport_expiration" />
-        </div>
-        <div class="field">
-          <label for="passport_country">Passport Country</label>
-          <input id="passport_country" type="text" name="passport_country" />
+          <label for="passport_expiration">Expiration Date *</label>
+          <input id="passport_expiration" type="date" name="passport_expiration" data-required="true"
+                 value="{{ form_data.get('passport_expiration','') if form_data }}" />
         </div>
       </div>
     </div>
 
-    <!-- Staff fields -->
+    <!-- ── Staff fields ─────────────────────────────────────────── -->
     <div id="staff-fields" style="display:none">
       <p class="eyebrow" style="margin-bottom:12px">Staff Details</p>
       <div class="form-grid">
         <div class="field">
-          <label for="username">Username</label>
-          <input id="username" type="text" name="username" />
+          <label for="username">Username *</label>
+          <input id="username" type="text" name="username" data-required="true"
+                 placeholder="jsmith" autocomplete="username" maxlength="50"
+                 value="{{ form_data.get('username','') if form_data }}" />
         </div>
         <div class="field">
-          <label for="first_name">First Name</label>
-          <input id="first_name" type="text" name="first_name" />
+          <label for="first_name">First Name *</label>
+          <input id="first_name" type="text" name="first_name" data-required="true"
+                 placeholder="Jane" autocomplete="given-name" maxlength="50"
+                 value="{{ form_data.get('first_name','') if form_data }}" />
         </div>
         <div class="field">
-          <label for="last_name">Last Name</label>
-          <input id="last_name" type="text" name="last_name" />
+          <label for="last_name">Last Name *</label>
+          <input id="last_name" type="text" name="last_name" data-required="true"
+                 placeholder="Smith" autocomplete="family-name" maxlength="50"
+                 value="{{ form_data.get('last_name','') if form_data }}" />
         </div>
         <div class="field">
-          <label for="staff_email">Email</label>
-          <input id="staff_email" type="email" name="staff_email" />
+          <label for="staff_email">Email *</label>
+          <input id="staff_email" type="email" name="staff_email" data-required="true"
+                 placeholder="jane@airline.com" autocomplete="email"
+                 value="{{ form_data.get('staff_email','') if form_data }}" />
         </div>
         <div class="field">
-          <label for="staff_phone_number">Phone</label>
-          <input id="staff_phone_number" type="tel" name="staff_phone_number" />
+          <label for="staff_phone_number">Phone *</label>
+          <input id="staff_phone_number" type="tel" name="staff_phone_number" data-required="true"
+                 placeholder="5551234567" autocomplete="tel" maxlength="20"
+                 value="{{ form_data.get('staff_phone_number','') if form_data }}" />
+          <small class="muted">Spaces and dashes are stripped automatically</small>
         </div>
         <div class="field">
-          <label for="date_of_birth_staff">Date of Birth</label>
-          <input id="date_of_birth_staff" type="date" name="date_of_birth" />
+          <label for="date_of_birth_staff">Date of Birth *</label>
+          <!-- Different name from customer to avoid collision when both sections are in the DOM -->
+          <input id="date_of_birth_staff" type="date" name="date_of_birth" data-required="true"
+                 value="{{ form_data.get('date_of_birth','') if form_data }}" />
         </div>
         <div class="field">
-          <label for="airline_name">Airline</label>
-          <select id="airline_name" name="airline_name">
+          <label for="airline_name">Airline *</label>
+          <select id="airline_name" name="airline_name" data-required="true">
             {% for airline in airlines %}
-            <option value="{{ airline['airline_name'] }}">{{ airline['airline_name'] }}</option>
+            <option value="{{ airline['airline_name'] }}"
+              {% if form_data and form_data.get('airline_name')==airline['airline_name'] %}selected{% endif %}>
+              {{ airline['airline_name'] }}
+            </option>
             {% endfor %}
           </select>
         </div>
       </div>
     </div>
 
+    <div id="pw-error" style="color:var(--red);font-size:0.85rem;margin-bottom:8px;display:none">
+      Passwords do not match.
+    </div>
+
     <div class="inline-actions" style="margin-top:8px">
-      <button type="submit">Register</button>
+      <button type="submit">Create Account</button>
       <a class="button-secondary" href="{{ url_for('login') }}">Already have an account</a>
     </div>
   </form>
@@ -121,8 +180,47 @@
 
 <script>
   function switchRole(val) {
-    document.getElementById('customer-fields').style.display = val === 'customer' ? '' : 'none';
-    document.getElementById('staff-fields').style.display   = val === 'staff'    ? '' : 'none';
+    const isCustomer     = val === 'customer';
+    const customerSection = document.getElementById('customer-fields');
+    const staffSection    = document.getElementById('staff-fields');
+
+    customerSection.style.display = isCustomer ? '' : 'none';
+    staffSection.style.display    = isCustomer ? 'none' : '';
+
+    // Disable hidden-section inputs so they are NOT submitted with the form
+    // (prevents date_of_birth and other shared-name fields from cross-contaminating)
+    customerSection.querySelectorAll('input, select').forEach(el => {
+      el.disabled = !isCustomer;
+      el.required  = isCustomer && el.dataset.required === 'true';
+    });
+    staffSection.querySelectorAll('input, select').forEach(el => {
+      el.disabled = isCustomer;
+      el.required  = !isCustomer && el.dataset.required === 'true';
+    });
   }
+
+  // Apply on load
+  switchRole(document.getElementById('user_type').value);
+
+  // Block submit if passwords don't match
+  document.getElementById('reg-form').addEventListener('submit', function(e) {
+    const pw    = document.getElementById('password').value;
+    const cpw   = document.getElementById('confirm_password').value;
+    const errEl = document.getElementById('pw-error');
+    if (pw !== cpw) {
+      e.preventDefault();
+      errEl.style.display = '';
+      document.getElementById('confirm_password').focus();
+    } else {
+      errEl.style.display = 'none';
+    }
+  });
+
+  // Live feedback while typing confirm password
+  document.getElementById('confirm_password').addEventListener('input', function() {
+    const pw = document.getElementById('password').value;
+    document.getElementById('pw-error').style.display =
+      (this.value && pw !== this.value) ? '' : 'none';
+  });
 </script>
 {% endblock %}

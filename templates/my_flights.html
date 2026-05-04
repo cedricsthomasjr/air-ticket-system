@@ -63,13 +63,11 @@
           {{ flight['source_city'] }} ({{ flight['source_airport'] }}) to
           {{ flight['destination_city'] }} ({{ flight['destination_airport'] }})
         </td>
-        <td>{{ flight['departure_time'] }}</td>
-        <td>{{ flight['arrival_time'] }}</td>
+        <td>{{ flight['departure_time']|dt }}</td>
+        <td>{{ flight['arrival_time']|dt }}</td>
         <td>
-          <span
-            class="status-chip {% if flight['status']|lower == 'delayed' %}delayed{% elif flight['status']|lower == 'cancelled' %}cancelled{% endif %}"
-          >
-            {{ flight['status'] }}
+          <span class="status-chip {% if flight['status'] == 'delayed' %}delayed{% elif flight['status'] == 'cancelled' %}cancelled{% endif %}">
+            {{ flight['status_label'] }}
           </span>
         </td>
       </tr>

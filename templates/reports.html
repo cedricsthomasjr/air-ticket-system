@@ -39,6 +39,15 @@
     <strong>Total sales</strong>
     <p>Calculated from ticketed flight prices.</p>
   </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:var(--yellow)">
+      {% if rating_stats['total_reviews'] > 0 %}
+        {{ '%.1f'|format(rating_stats['avg_rating']) }}
+      {% else %}—{% endif %}
+    </div>
+    <strong>Avg customer rating</strong>
+    <p>{{ rating_stats['total_reviews'] }} review{{ 's' if rating_stats['total_reviews'] != 1 }} across all flights</p>
+  </div>
 </section>
 
 <section class="panel">
@@ -143,6 +152,87 @@
   </div>
   {% endif %}
 </section>
+{% if rating_stats['total_reviews'] > 0 %}
+<section class="panel">
+  <p class="eyebrow">Rating Distribution</p>
+  <div style="display:grid;gap:8px;margin-top:4px">
+    {% set star_key = {5:'five_star', 4:'four_star', 3:'three_star', 2:'two_star', 1:'one_star'} %}
+    {% for n in [5,4,3,2,1] %}
+    {% set count = (rating_stats[star_key[n]] or 0)|int %}
+    {% set pct = (count / rating_stats['total_reviews'] * 100)|round(0)|int %}
+    <div style="display:flex;align-items:center;gap:12px;font-size:0.85rem">
+      <span style="width:18px;text-align:right;color:var(--yellow)">{{ n }}★</span>
+      <div style="flex:1;background:var(--surface2);border-radius:4px;height:10px;overflow:hidden">
+        <div style="width:{{ pct }}%;background:var(--yellow);height:100%;border-radius:4px;transition:width 0.4s"></div>
+      </div>
+      <span style="width:28px;color:var(--text-muted)">{{ count }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="panel">
+  <p class="eyebrow">Ratings by Flight</p>
+  {% if flight_ratings %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Flight</th>
+        <th>Route</th>
+        <th>Date</th>
+        <th>Avg Rating</th>
+        <th>Reviews</th>
+      </tr>
+      {% for row in flight_ratings %}
+      <tr>
+        <td>{{ row['flight_number'] }}</td>
+        <td>{{ row['route'] }}</td>
+        <td>{{ row['flight_date'] }}</td>
+        <td>
+          <span style="color:var(--yellow);font-weight:500">{{ row['avg_rating'] }}</span>
+          <span style="color:var(--text-muted);font-size:0.8rem"> / 5</span>
+        </td>
+        <td>{{ row['review_count'] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <p class="eyebrow">Recent Customer Reviews</p>
+  <div style="display:grid;gap:16px;margin-top:8px">
+    {% for r in recent_reviews %}
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <div>
+          <strong>{{ r['customer_name'] }}</strong>
+          <span class="muted" style="margin-left:10px">{{ r['route'] }} · {{ r['flight_number'] }} · {{ r['flight_date'] }}</span>
+        </div>
+        <span style="color:var(--yellow);font-size:1rem;letter-spacing:2px">
+          {% for i in range(r['rating']) %}★{% endfor %}{% for i in range(5 - r['rating']) %}<span style="opacity:0.25">★</span>{% endfor %}
+        </span>
+      </div>
+      {% if r['comment'] %}
+      <p style="font-size:0.875rem;margin:0">{{ r['comment'] }}</p>
+      {% else %}
+      <p style="font-size:0.875rem;margin:0;opacity:0.4;font-style:italic">No comment left.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% else %}
+<section class="panel">
+  <p class="eyebrow">Customer Ratings</p>
+  <div class="empty-state">
+    <strong>No ratings yet.</strong>
+    <p>Customer reviews will appear here once passengers rate completed flights.</p>
+  </div>
+</section>
+{% endif %}
+
 {% if monthly %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

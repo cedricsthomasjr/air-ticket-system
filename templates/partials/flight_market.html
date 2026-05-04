@@ -19,7 +19,7 @@
       <div>
         <p class="eyebrow">{{ flight['airline_name'] }}</p>
         <h2>{{ flight['flight_number'] }}</h2>
-        <span class="fare-small">{{ flight['departure_time'] }}</span>
+        <span class="fare-small">{{ flight['departure_time']|dt }}</span>
       </div>
       <span class="urgency-badge">
         {{ flight['seats_available'] if flight['seats_available'] is not none else 'Open' }} seats left
@@ -41,7 +41,7 @@
     <div class="fare-footer">
       <div class="rating-meta">
         <span class="metric-pill">{{ flight['status_label'] or flight['status'] }}</span>
-        <span class="metric-pill">Arrives {{ flight['arrival_time'] }}</span>
+        <span class="metric-pill">Arrives {{ flight['arrival_time']|dt }}</span>
       </div>
       <div class="fare-price">
         <strong>${{ '%.2f'|format(flight['price']) }}</strong>

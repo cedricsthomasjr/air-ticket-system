@@ -57,7 +57,7 @@
         <td>{{ customer['email'] }}</td>
         <td>{{ customer['phone_number'] }}</td>
         <td>{{ customer['tickets_purchased'] }}</td>
-        <td>{{ customer['last_purchase'] }}</td>
+        <td>{{ customer['last_purchase']|dt }}</td>
       </tr>
       {% endfor %}
     </table>

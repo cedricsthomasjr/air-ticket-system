@@ -28,14 +28,14 @@
       <p class="eyebrow">{{ flight['airline_name'] }}</p>
       <h2>{{ flight['source_city'] }} to {{ flight['destination_city'] }}</h2>
       <p>
-        Departed {{ flight['departure_time'] }} and arrived
-        {{ flight['arrival_time'] }}.
+        Departed {{ flight['departure_time']|dt }} and arrived
+        {{ flight['arrival_time']|dt }}.
       </p>
     </div>
 
     <div class="rating-meta">
       <span class="metric-pill">Flight {{ flight['flight_number'] }}</span>
-      <span class="metric-pill">{{ flight['status'] }}</span>
+      <span class="metric-pill">{{ flight['status_label'] }}</span>
       {% if flight['rating'] %}
       <span class="metric-pill">Current score: {{ flight['rating'] }}/5</span>
       {% else %}
@@ -53,7 +53,7 @@
             type="radio"
             name="rating"
             value="{{ rating }}"
-            {% if flight['rating'] == rating or (not flight['rating'] and rating == 5) %}checked{% endif %}
+            {% if flight['rating'] == rating %}checked{% endif %}
           />
           <label for="rating-{{ card_id }}-{{ rating }}">{{ rating }}</label>
           {% endfor %}

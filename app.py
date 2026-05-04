@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from functools import wraps
 import hashlib
 import os
+import re
 
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, session, url_for
@@ -116,9 +117,22 @@ def login_required(role=None):
 
 
 def format_dt(value):
+    """Internal formatter — keeps the YYYY-MM-DD HH:MM:SS form used by flight_key."""
     if isinstance(value, datetime):
         return value.strftime("%Y-%m-%d %H:%M:%S")
     return str(value)
+
+
+def display_dt(value):
+    """Human-readable datetime for templates: 'May 1, 2026 · 14:30'."""
+    if isinstance(value, datetime):
+        return value.strftime("%b %-d, %Y · %H:%M")
+    if value:
+        return str(value)
+    return ""
+
+
+app.jinja_env.filters["dt"] = display_dt
 
 
 def parse_datetime_local(value):
@@ -236,6 +250,10 @@ def reset_db():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if session.get("user_type") == "customer":
+        return redirect(url_for("customer_home"))
+    if session.get("user_type") == "staff":
+        return redirect(url_for("staff_home"))
     ensure_db_exists()
 
     if request.method == "POST":
@@ -282,8 +300,20 @@ def login():
     return render_template("login.html")
 
 
+def normalize_phone(raw):
+    """Strip all non-digit characters except a leading +."""
+    raw = raw.strip()
+    if raw.startswith("+"):
+        return "+" + re.sub(r"\D", "", raw[1:])
+    return re.sub(r"\D", "", raw)
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    if session.get("user_type") == "customer":
+        return redirect(url_for("customer_home"))
+    if session.get("user_type") == "staff":
+        return redirect(url_for("staff_home"))
     ensure_db_exists()
     conn = get_db_connection()
     cursor = dict_cursor(conn)
@@ -291,28 +321,41 @@ def register():
     airlines = cursor.fetchall()
 
     if request.method == "POST":
-        user_type = request.form["user_type"]
+        form_data = request.form
+
+        # --- Validation (outside try so errors don't get swallowed) ---
+        if request.form.get("password") != request.form.get("confirm_password"):
+            flash("Passwords do not match.")
+            cursor.close()
+            conn.close()
+            return render_template("register.html", airlines=airlines, form_data=form_data)
+
+        user_type = request.form.get("user_type", "customer")
+
+        if user_type == "customer":
+            required = ["email", "name", "phone_number",
+                        "passport_number", "passport_expiration",
+                        "passport_country", "date_of_birth"]
+            if not all(request.form.get(f, "").strip() for f in required):
+                flash("Please fill in all required fields (marked with *).")
+                cursor.close()
+                conn.close()
+                return render_template("register.html", airlines=airlines, form_data=form_data)
+        else:
+            required = ["username", "first_name", "last_name",
+                        "date_of_birth", "airline_name", "staff_email",
+                        "staff_phone_number"]
+            if not all(request.form.get(f, "").strip() for f in required):
+                flash("Please fill in all required fields (marked with *).")
+                cursor.close()
+                conn.close()
+                return render_template("register.html", airlines=airlines, form_data=form_data)
+
+        # --- Insert ---
         password = md5_hash(request.form["password"])
         try:
             if user_type == "customer":
-                email = request.form.get("email", "").strip()
-                name = request.form.get("name", "").strip()
-                required_customer_fields = [
-                    "email",
-                    "name",
-                    "building_number",
-                    "street",
-                    "city",
-                    "state",
-                    "phone_number",
-                    "passport_number",
-                    "passport_expiration",
-                    "passport_country",
-                    "date_of_birth",
-                ]
-                if not all(request.form.get(field, "").strip() for field in required_customer_fields):
-                    flash("Customer registration requires all profile and passport fields.")
-                    return render_template("register.html", airlines=airlines)
+                phone = normalize_phone(request.form.get("phone_number", ""))
                 cursor.execute(
                     """
                     INSERT INTO Customer (
@@ -323,14 +366,14 @@ def register():
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
                     (
-                        email,
+                        request.form["email"].strip(),
                         password,
-                        name,
-                        request.form["building_number"].strip(),
-                        request.form["street"].strip(),
-                        request.form["city"].strip(),
-                        request.form["state"].strip(),
-                        request.form["phone_number"].strip(),
+                        request.form["name"].strip(),
+                        request.form.get("building_number", "").strip() or None,
+                        request.form.get("street", "").strip() or None,
+                        request.form.get("city", "").strip() or None,
+                        request.form.get("state", "").strip() or None,
+                        phone or None,
                         request.form["passport_number"].strip(),
                         request.form["passport_expiration"],
                         request.form["passport_country"].strip(),
@@ -338,31 +381,8 @@ def register():
                     ),
                 )
             else:
-                username = request.form.get("username", "").strip()
-                first_name = request.form.get("first_name", "").strip()
-                last_name = request.form.get("last_name", "").strip()
-                staff_email = (
-                    request.form.get("staff_email", "").strip()
-                    or request.form.get("email", "").strip()
-                )
-                staff_phone_number = (
-                    request.form.get("staff_phone_number", "").strip()
-                    or request.form.get("phone_number", "").strip()
-                )
-                required_staff_fields = [
-                    "username",
-                    "first_name",
-                    "last_name",
-                    "date_of_birth",
-                    "airline_name",
-                ]
-                if (
-                    not all(request.form.get(field, "").strip() for field in required_staff_fields)
-                    or not staff_email
-                    or not staff_phone_number
-                ):
-                    flash("Staff registration requires name, airline, birth date, email, and phone.")
-                    return render_template("register.html", airlines=airlines)
+                username = request.form["username"].strip()
+                staff_phone = normalize_phone(request.form.get("staff_phone_number", ""))
                 cursor.execute(
                     """
                     INSERT INTO Airline_Staff
@@ -372,19 +392,16 @@ def register():
                     (
                         username,
                         password,
-                        first_name,
-                        last_name,
+                        request.form["first_name"].strip(),
+                        request.form["last_name"].strip(),
                         request.form["date_of_birth"],
-                        staff_email,
+                        request.form["staff_email"].strip(),
                         request.form["airline_name"],
                     ),
                 )
                 cursor.execute(
-                    """
-                    INSERT INTO Staff_Phone (username, phone_number)
-                    VALUES (%s, %s)
-                    """,
-                    (username, staff_phone_number),
+                    "INSERT INTO Staff_Phone (username, phone_number) VALUES (%s, %s)",
+                    (username, staff_phone),
                 )
             conn.commit()
             flash("Registration successful. Please log in.")
@@ -392,14 +409,17 @@ def register():
         except mysql.connector.IntegrityError:
             conn.rollback()
             flash("That email or username is already registered.")
+        except Exception as e:
+            conn.rollback()
+            flash(f"Registration failed: {e}")
         finally:
             cursor.close()
             conn.close()
-        return render_template("register.html", airlines=airlines)
+        return render_template("register.html", airlines=airlines, form_data=form_data)
 
     cursor.close()
     conn.close()
-    return render_template("register.html", airlines=airlines)
+    return render_template("register.html", airlines=airlines, form_data=None)
 
 
 @app.route("/public/search", methods=["GET", "POST"])
@@ -768,6 +788,26 @@ def staff_flights():
         ),
     )
     flights = normalize_flights(cursor.fetchall())
+    # Attach avg ratings to each flight
+    cursor.execute(
+        """
+        SELECT flight_number, departure_datetime,
+               ROUND(AVG(rating), 1) AS avg_rating,
+               COUNT(rating)         AS review_count
+        FROM Rating
+        WHERE airline_name = %s
+        GROUP BY flight_number, departure_datetime
+        """,
+        (session["airline_name"],),
+    )
+    rating_map = {
+        (r["flight_number"], r["departure_datetime"]): r
+        for r in cursor.fetchall()
+    }
+    for f in flights:
+        r = rating_map.get((f["flight_number"], f["departure_time"]), {})
+        f["avg_rating"]   = r.get("avg_rating")
+        f["review_count"] = r.get("review_count", 0)
     cursor.close()
     conn.close()
     return render_template(
@@ -863,10 +903,10 @@ def create_flight():
                 (
                     session["airline_name"],
                     flight_number,
-                    format_dt(departure_time),
+                    departure_time,
                     departure_airport,
                     arrival_airport,
-                    format_dt(arrival_time),
+                    arrival_time,
                     base_price,
                     status,
                     airplane_id,
@@ -1047,8 +1087,11 @@ def add_airport():
 @app.route("/staff/customers")
 @login_required(role="staff")
 def staff_customers():
-    start_date = request.args.get("start_date", "").strip()
-    end_date = request.args.get("end_date", "").strip()
+    today = datetime.now().date()
+    raw_start  = request.args.get("start_date", "").strip()
+    raw_end    = request.args.get("end_date",   "").strip()
+    start_date = raw_start or "2000-01-01"
+    end_date   = raw_end   or today.isoformat()
 
     conn = get_db_connection()
     cursor = dict_cursor(conn)
@@ -1062,12 +1105,11 @@ def staff_customers():
              AND f.flight_number = t.flight_number
              AND f.departure_datetime = t.departure_datetime
         WHERE f.airline_name = %s
-          AND (%s = '' OR DATE(t.purchase_datetime) >= %s)
-          AND (%s = '' OR DATE(t.purchase_datetime) <= %s)
+          AND DATE(t.purchase_datetime) BETWEEN %s AND %s
         GROUP BY c.email, c.name, c.phone_number
         ORDER BY tickets_purchased DESC, last_purchase DESC
         """,
-        (session["airline_name"], start_date, start_date, end_date, end_date),
+        (session["airline_name"], start_date, end_date),
     )
     customers = cursor.fetchall()
     frequent_customer = customers[0] if customers else None
@@ -1077,8 +1119,8 @@ def staff_customers():
         "staff_customers.html",
         customers=customers,
         frequent_customer=frequent_customer,
-        start_date=start_date,
-        end_date=end_date,
+        start_date=raw_start,
+        end_date=raw_end,
     )
 
 
@@ -1165,6 +1207,68 @@ def reports():
         (session["airline_name"],),
     )
     status_counts = cursor.fetchall()
+    # Rating stats for this airline (all time, not date-filtered)
+    cursor.execute(
+        """
+        SELECT
+            COALESCE(AVG(rating), 0)                                    AS avg_rating,
+            COUNT(rating)                                               AS total_reviews,
+            SUM(rating = 5)                                             AS five_star,
+            SUM(rating = 4)                                             AS four_star,
+            SUM(rating = 3)                                             AS three_star,
+            SUM(rating = 2)                                             AS two_star,
+            SUM(rating = 1)                                             AS one_star
+        FROM Rating
+        WHERE airline_name = %s
+        """,
+        (session["airline_name"],),
+    )
+    rating_stats = cursor.fetchone()
+    # Per-flight average — most recent 10 rated flights
+    cursor.execute(
+        """
+        SELECT r.flight_number,
+               CONCAT(dep.airport_code, ' → ', arr.airport_code) AS route,
+               DATE(r.departure_datetime)                              AS flight_date,
+               ROUND(AVG(r.rating), 1)                                AS avg_rating,
+               COUNT(r.rating)                                        AS review_count
+        FROM Rating r
+        JOIN Flight f   ON f.airline_name       = r.airline_name
+                       AND f.flight_number      = r.flight_number
+                       AND f.departure_datetime = r.departure_datetime
+        JOIN Airport dep ON dep.airport_code = f.departure_airport_code
+        JOIN Airport arr ON arr.airport_code = f.arrival_airport_code
+        WHERE r.airline_name = %s
+        GROUP BY r.flight_number, r.departure_datetime, route
+        ORDER BY r.departure_datetime DESC
+        LIMIT 10
+        """,
+        (session["airline_name"],),
+    )
+    flight_ratings = cursor.fetchall()
+    # Individual reviews — most recent 15
+    cursor.execute(
+        """
+        SELECT r.rating,
+               r.comment,
+               c.name                                                  AS customer_name,
+               r.flight_number,
+               CONCAT(dep.airport_code, ' → ', arr.airport_code) AS route,
+               DATE(r.departure_datetime)                              AS flight_date
+        FROM Rating r
+        JOIN Customer c ON c.email = r.customer_email
+        JOIN Flight f   ON f.airline_name       = r.airline_name
+                       AND f.flight_number      = r.flight_number
+                       AND f.departure_datetime = r.departure_datetime
+        JOIN Airport dep ON dep.airport_code = f.departure_airport_code
+        JOIN Airport arr ON arr.airport_code = f.arrival_airport_code
+        WHERE r.airline_name = %s
+        ORDER BY r.departure_datetime DESC
+        LIMIT 15
+        """,
+        (session["airline_name"],),
+    )
+    recent_reviews = cursor.fetchall()
     chart_months = [row["month"] for row in monthly]
     chart_tickets = [int(row["tickets_sold"]) for row in monthly]
     cursor.close()
@@ -1176,6 +1280,9 @@ def reports():
         top_routes=top_routes,
         top_customers=top_customers,
         status_counts=status_counts,
+        rating_stats=rating_stats,
+        flight_ratings=flight_ratings,
+        recent_reviews=recent_reviews,
         chart_months=chart_months,
         chart_tickets=chart_tickets,
         start_date=start_date,
@@ -1185,4 +1292,5 @@ def reports():
 
 if __name__ == "__main__":
     ensure_db_exists()
-    app.run(debug=True)
+    port = int(os.getenv("FLASK_RUN_PORT", os.getenv("PORT", "5001")))
+    app.run(debug=True, port=port)

@@ -77,5 +77,5 @@ venv/bin/python -m flask --app app run --port 5001
 
 Demo accounts after seeding:
 
-- Customer: `cj@nyu.edu / pass123`
-- Staff: `admin1 / adminpass`
+- Customer: `testcustomer@nyu.edu / 1234`
+- Staff: `admin / abcd`
